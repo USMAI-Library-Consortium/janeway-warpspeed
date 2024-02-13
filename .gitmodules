@@ -1,3 +1,9 @@
 [submodule "janeway"]
 	path = janeway
 	url = https://github.com/BirkbeckCTP/janeway.git
+[submodule "plugins/pandoc_plugin"]
+	path = plugins/pandoc_plugin
+	url = https://github.com/BirkbeckCTP/pandoc_plugin.git
+[submodule "plugins/typesetting"]
+	path = plugins/typesetting
+	url = https://github.com/BirkbeckCTP/typesetting.git

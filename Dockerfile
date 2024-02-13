@@ -67,11 +67,13 @@ COPY ./janeway/src /vol/janeway/src
 COPY prod_settings.py /vol/janeway/src/core
 COPY wsgi.py /vol/janeway/src/core
 COPY ./janeway/setup_scripts /vol/janeway/setup_scripts
+COPY ./plugins/pandoc_plugin /vol/janeway/src/plugins/pandoc_plugin
+COPY ./plugins/typesetting /vol/janeway/src/plugins/typesetting
 # move the static files into temp-static 
 # for kubernetes to move to a volume mount (Not finished)
 
 # Generate python bytecode files
-RUN source ${VENV_PATH}/bin/activate && python3 -m compileall
+RUN source ${VENV_PATH}/bin/activate && python3 -m compileall /vol/janeway
 
 # Grant permissions to the www-data user & the www-data group, which are the default
 # user and group for apache
