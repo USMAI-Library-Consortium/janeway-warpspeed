@@ -5,8 +5,6 @@ SHELL ["/bin/bash", "-c"]
 # Install debian dependencies
 #------------------------------------------------------
 RUN apt-get update
-# These may not all be neccesary. Some of them were 
-# copied from an outdated config file. 
 RUN apt-get install -y gettext pandoc cron
 
 # Set environment variabes. 
@@ -16,19 +14,12 @@ RUN apt-get install -y gettext pandoc cron
 #--
 # Set the Janeway Config File
 ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
-
-#
-# FOR THE FOLLOWING 2 SETTINGS, these should be folders that are only
-# used for these purposes. There should be nothing in them by default,
-# and they shouldn't be used by other programs. For instance, MEDIA_DIR
-# can't be /media, as that's a pre-existing folder used by Debian. 
-
 # Set the media directory. This is the default location, and it can 
 # be changed
 ENV MEDIA_DIR=/vol/janeway/src/media
 
 # Settings you can't overwrite with Kubernetes
-#--
+#----------------------------------------------------------
 # The path for the virtual environment
 ENV VENV_PATH=/opt/venv
 # Append the location of the virtual environment to the path
