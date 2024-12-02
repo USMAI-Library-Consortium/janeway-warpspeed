@@ -36,6 +36,7 @@ RUN python3 -m venv $VENV_PATH
 WORKDIR /vol/janeway
 ADD ./janeway/requirements.txt /vol/janeway
 RUN source ${VENV_PATH}/bin/activate && pip3 install -r requirements.txt
+RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=23.0.0,<24.0.0'
 # Don't generate pycache files for the Janeway installation internally -
 # That's why its not with the other ENV Variables - I'm allowing
 # it for the pip3 install but not Janeway
@@ -48,7 +49,8 @@ COPY ./janeway/setup_scripts /vol/janeway/setup_scripts
 # move the static files into temp-static 
 # for kubernetes to move to a volume mount (Not finished)
 
-# Generate python bytecode files
+# Generate python bytecode files - they cannot be generated on the k8s because
+# Read-Only-Filesystems is enabled.
 RUN source ${VENV_PATH}/bin/activate && python3 -m compileall .
 
 # Grant permissions to the www-data user & the www-data group, which are the default
@@ -60,8 +62,7 @@ RUN mkdir ${STATIC_DIR} ${MEDIA_DIR}
 # You must set the permissions for mounted volumes in Kubernetes. This is done in the 
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
-RUN chown -R www-data:www-data /vol/janeway \
-  ${STATIC_DIR} ${MEDIA_DIR}
+RUN chown -R www-data:www-data /vol/janeway ${STATIC_DIR} ${MEDIA_DIR}
 # Allow www-data to use cron
 RUN usermod -aG crontab www-data
 # Set the active user to the apache default
