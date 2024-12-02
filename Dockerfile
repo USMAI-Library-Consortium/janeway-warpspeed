@@ -1,5 +1,5 @@
 # Based on python 3.8 Debian
-FROM python:3.8
+FROM python:3.10
 SHELL ["/bin/bash", "-c"]
 
 # Install debian dependencies
