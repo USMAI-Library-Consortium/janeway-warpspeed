@@ -15,22 +15,31 @@ DB_EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$POSTGRES_USER" -d postgres -tA
 
 if [[ "$DB_EXISTS" == "1" ]]; then
     echo "Database $DB_NAME exists."
-    JANEWAY_INSTALLED=true
+    JANEWAY_INSTALLED=TRUE
 else
     echo "Database $DB_NAME does not exist."
-    JANEWAY_INSTALLED=false
+    JANEWAY_INSTALLED=FALSE
 fi
 
 cd /vol/janeway
 source "$VENV_PATH/bin/activate"
 
-if [[ "$JANEWAY_INSTALLED" == false ]]; then
-
+if [[ "$JANEWAY_INSTALLED" == FALSE ]]; then
     # Ensure required environment variables are set
     if [[ -z "$JANEWAY_PRESS_NAME" || -z "$JANEWAY_PRESS_DOMAIN" || -z "$JANEWAY_PRESS_CONTACT" || -z "$JANEWAY_JOURNAL_CODE" || -z "$JANEWAY_JOURNAL_NAME" ]]; then
         echo "Missing required environment variables for janeway install."
         exit 1
     fi
+
+    if [[ $USE_TYPESETTING_PLUGIN == TRUE ]]; then
+        rm -rf /vol/janeway/src/plugins/typesetting
+        cp -r /tmp/plugins/typesetting /vol/janeway/src/plugins
+    fi
+    if [[ $USE_PANDOC_PLUGIN == TRUE ]]; then
+        rm -rf /vol/janeway/src/plugins/pandoc_plugin
+        cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
+    fi
+
     python3 src/manage.py install_janeway --use-defaults
 else
     INSTALLED_VERSION=INSTALLED_VERSION=$(psql -U admin -d "postgres-janeway" -tc "SELECT MAX(number) FROM utils_version" | xargs)
@@ -41,6 +50,16 @@ else
 
         if [[ "$INSTALLED_VERSION" != "$INCOMING_VERSION" ]]; then
             echo "Installed version $INSTALLED_VERSION is out of date; installing version $INCOMING_VERSION..."
+
+            if [[ $USE_TYPESETTING_PLUGIN == TRUE ]]; then
+                rm -rf /vol/janeway/src/plugins/typesetting
+                cp -r /tmp/plugins/typesetting /vol/janeway/src/plugins
+            fi
+            if [[ $USE_PANDOC_PLUGIN == TRUE ]]; then
+                rm -rf /vol/janeway/src/plugins/pandoc_plugin
+                cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
+            fi
+            
             python3 src/manage.py load_default_settings
             python3 src/manage.py update_repository_settings
             python3 src/manage.py install_plugins

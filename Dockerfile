@@ -49,6 +49,7 @@ COPY ./janeway/src /vol/janeway/src
 COPY prod_settings.py /vol/janeway/src/core
 COPY ./janeway/setup_scripts /vol/janeway/setup_scripts
 COPY run-k8s.sh /vol/janeway/setup_scripts
+COPY plugins /tmp
 
 # Generate python bytecode files - they cannot be generated on the k8s because
 # Read-Only-Filesystems is enabled.
@@ -72,8 +73,5 @@ USER www-data
 # Set the working directory back to the code repo for convenience
 WORKDIR /vol/janeway
 RUN cp src/core/janeway_global_settings.py src/core/settings.py
-
-# YOU MUST INSTALL JANEWAY BEFORE THE SITE WILL WORK. YOU CAN DO THIS BY EXEC-ING INTO THE CONTAINER AND
-# RUNNING /vol/janeway/src/manage.py install_janeway. This only needs to be done once. 
 
 ENTRYPOINT ["/vol/janeway/setup_scripts/run-k8s.sh"]
