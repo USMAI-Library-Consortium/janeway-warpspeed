@@ -8,8 +8,8 @@ This docker image is currently designed to use Postgres.
 1. DB_HOST: Hostname of your Postgres DB
 2. DB_PORT: Postgres DB Port
 3. DB_NAME: Name of your db within postgres
-4. POSTGRES_USER: Name of the postgres user
-5. POSTGRES_PASSWORD: Password to connect to the postgres DB
+4. DB_USER: Name of the postgres user
+5. DB_PASSWORD: Password to connect to the postgres DB
 6. JANEWAY_PRESS_NAME: Specifies the Press Name to use when installing Janeway
 7. JANEWAY_PRESS_DOMAIN: Specifies the Press Domain to use when installing Janeway. Should be the same as the domain name that you give Janeway
 8. JANEWAY_PRESS_CONTACT: Specifies the Press Contact email address to use when installing Janeway

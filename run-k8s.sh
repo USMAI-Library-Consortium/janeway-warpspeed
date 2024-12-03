@@ -3,15 +3,15 @@
 set -e
 
 # Ensure required environment variables are set
-if [[ -z "$DB_HOST" || -z "$DB_PORT" || -z "$DB_NAME" || -z "$POSTGRES_USER" || -z "$POSTGRES_PASSWORD" ]]; then
+if [[ -z "$DB_HOST" || -z "$DB_PORT" || -z "$DB_NAME" || -z "$DB_USER" || -z "$DB_PASSWORD" ]]; then
     echo "Missing required environment variables for DB connection."
     exit 1
 fi
 
 # Check if the database exists
-export PGPASSWORD=$POSTGRES_PASSWORD
+export PGPASSWORD=$DB_PASSWORD
 
-DB_EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$POSTGRES_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME';")
+DB_EXISTS=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME';")
 
 if [[ "$DB_EXISTS" == "1" ]]; then
     echo "Database $DB_NAME exists."
@@ -42,9 +42,9 @@ if [[ "$JANEWAY_INSTALLED" == FALSE ]]; then
 
     python3 src/manage.py install_janeway --use-defaults
 else
-    INSTALLED_VERSION=INSTALLED_VERSION=$(psql -U admin -d "postgres-janeway" -tc "SELECT MAX(number) FROM utils_version" | xargs)
+    INSTALLED_VERSION=INSTALLED_VERSION=$(psql -U "$DB_USER" -d "postgres-janeway" -tc "SELECT MAX(number) FROM utils_version" | xargs)
     python3 src/manage.py migrate
-    INCOMING_VERSION=INSTALLED_VERSION=$(psql -U admin -d "postgres-janeway" -tc "SELECT MAX(number) FROM utils_version" | xargs)
+    INCOMING_VERSION=INSTALLED_VERSION=$(psql -U "$DB_USER" -d "postgres-janeway" -tc "SELECT MAX(number) FROM utils_version" | xargs)
 
     if [[ "$(printf '%s\n' "$INSTALLED_VERSION" "$INCOMING_VERSION" | sort -V | tail -n 1)" == "$INCOMING_VERSION" ]]; then
 
