@@ -1,5 +1,3 @@
-# COPY THIS FILE TO src/core
-
 import os
 
 # Set the static and media directories 
@@ -13,8 +11,8 @@ MEDIA_ROOT = os.environ['MEDIA_DIR']
 #
 # It also works in Docker because it will return true even if it receives a
 # boolean
-def convert_env_to_bool (env):
-    if env == 'True' or env == 'true' or env == True:
+def convert_env_to_bool (env: str):
+    if env.upper() == 'TRUE' or env == True:
         return True
     else: return False
 # Enable ORCID to be configured by Kubernetes
