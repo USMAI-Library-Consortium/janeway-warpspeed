@@ -64,7 +64,7 @@ RUN mkdir ${STATIC_DIR} ${MEDIA_DIR}
 # You must set the permissions for mounted volumes in Kubernetes. This is done in the 
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
-RUN chown -R www-data:www-data /vol/janeway ${STATIC_DIR} ${MEDIA_DIR}
+RUN chown -R www-data:www-data /vol/janeway ${STATIC_DIR} ${MEDIA_DIR} /tmp/plugins
 # Allow www-data to use cron
 RUN usermod -aG crontab www-data
 # Set the active user to the apache default
