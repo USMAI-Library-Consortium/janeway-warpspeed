@@ -70,8 +70,12 @@ RUN usermod -aG crontab www-data
 # Set the active user to the apache default
 USER www-data
 
+# Run image-side janeway setup info.
+RUN source ${VENV_PATH}/bin/activate && python3 src/manage.py collectstatic --no-input
+RUN source ${VENV_PATH}/bin/activate && python3 src/manage.py build_assets
+RUN source ${VENV_PATH}/bin/activate && python3 src/manage.py compilemessages
+
 # Set the working directory back to the code repo for convenience
-WORKDIR /vol/janeway
 RUN cp src/core/janeway_global_settings.py src/core/settings.py
 
 ENTRYPOINT ["/vol/janeway/setup_scripts/run-k8s.sh"]
