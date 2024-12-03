@@ -40,7 +40,7 @@ if [[ "$JANEWAY_INSTALLED" == FALSE ]]; then
         cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
     fi
 
-    python3 src/manage.py install_janeway --use-defaults
+    python3 src/manage.py install_janeway_k8s --use-defaults
 else
     INSTALLED_VERSION=INSTALLED_VERSION=$(psql -U "$DB_USER" -d "postgres-janeway" -tc "SELECT MAX(number) FROM utils_version" | xargs)
     python3 src/manage.py migrate

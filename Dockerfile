@@ -49,6 +49,7 @@ COPY ./janeway/src /vol/janeway/src
 COPY prod_settings.py /vol/janeway/src/core
 COPY ./janeway/setup_scripts /vol/janeway/setup_scripts
 COPY run-k8s.sh /vol/janeway/setup_scripts
+COPY install_janeway_k8s.py /vol/janeway/src/cron/management/commands
 COPY plugins /tmp
 
 # Generate python bytecode files - they cannot be generated on the k8s because
