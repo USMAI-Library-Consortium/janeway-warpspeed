@@ -17,6 +17,7 @@ This docker image is currently designed to use Postgres.
 10. JANEWAY_JOURNAL_NAME: Specifies the Journal Name to use when installing Janeway 
 11. INSTALL_TYPESETTING_PLUGIN: Whether to install the typesetting plugin - TRUE or FALSE
 12. INSTALL_PANDOC_PLUGIN: Whether to install the pandoc plugin - TRUE or FALSE
+13. INSTALL_CUSTOMSTYLING_PLUGIN: Whether to install the custom styling plugin - TRUE or FALSE
 
 ## Optional environment variables
 1. JANEWAY_JOURNAL_DESCRIPTION
