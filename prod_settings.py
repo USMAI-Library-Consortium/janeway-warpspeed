@@ -11,7 +11,7 @@ MEDIA_ROOT = os.environ['MEDIA_DIR']
 #
 # It also works in Docker because it will return true even if it receives a
 # boolean
-def convert_env_to_bool (env: str):
+def convert_env_to_bool(env: str):
     if env.upper() == 'TRUE' or env == True:
         return True
     else: return False

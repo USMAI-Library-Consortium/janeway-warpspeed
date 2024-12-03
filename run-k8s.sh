@@ -39,6 +39,10 @@ if [[ "$JANEWAY_INSTALLED" == FALSE ]]; then
         rm -rf /vol/janeway/src/plugins/pandoc_plugin
         cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
     fi
+    if [[ $INSTALL_CUSTOMSTYLING_PLUGIN == TRUE ]]; then
+        rm -rf /vol/janeway/src/plugins/customstyling
+        cp -r /tmp/plugins/customstyling /vol/janeway/src/plugins
+    fi
 
     python3 src/manage.py install_janeway_k8s --use-defaults
 else
@@ -58,6 +62,10 @@ else
             if [[ $INSTALL_PANDOC_PLUGIN == TRUE ]]; then
                 rm -rf /vol/janeway/src/plugins/pandoc_plugin
                 cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
+            fi
+            if [[ $INSTALL_CUSTOMSTYLING_PLUGIN == TRUE ]]; then
+                rm -rf /vol/janeway/src/plugins/customstyling
+                cp -r /tmp/plugins/customstyling /vol/janeway/src/plugins
             fi
 
             python3 src/manage.py load_default_settings

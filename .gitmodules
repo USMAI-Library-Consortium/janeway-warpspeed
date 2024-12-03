@@ -7,3 +7,6 @@
 [submodule "plugins/pandoc_plugin"]
 	path = plugins/pandoc_plugin
 	url = https://github.com/openlibhums/pandoc_plugin.git
+[submodule "plugins/customstyling"]
+	path = plugins/customstyling
+	url = https://github.com/openlibhums/customstyling.git
