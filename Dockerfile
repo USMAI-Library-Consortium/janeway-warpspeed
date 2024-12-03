@@ -48,6 +48,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 COPY ./janeway/src /vol/janeway/src
 COPY prod_settings.py /vol/janeway/src/core
 COPY ./janeway/setup_scripts /vol/janeway/setup_scripts
+COPY run-k8s.sh /vol/janeway/setup_scripts
 
 # Generate python bytecode files - they cannot be generated on the k8s because
 # Read-Only-Filesystems is enabled.
