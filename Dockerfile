@@ -1,11 +1,13 @@
-# Based on python 3.8 Debian
+# Based on python 3.10 Debian
 FROM python:3.10
 SHELL ["/bin/bash", "-c"]
 
 # Install debian dependencies
 #------------------------------------------------------
 RUN apt-get update
-RUN apt-get install -y gettext pandoc cron
+RUN apt-get install -y gettext pandoc cron postgresql-client \
+    libxml2-dev libxslt1-dev zlib1g-dev lib32z1-dev libffi-dev \
+    libssl-dev libjpeg-dev
 
 # Set environment variabes. 
 #------------------------------------------------------
@@ -46,8 +48,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 COPY ./janeway/src /vol/janeway/src
 COPY prod_settings.py /vol/janeway/src/core
 COPY ./janeway/setup_scripts /vol/janeway/setup_scripts
-# move the static files into temp-static 
-# for kubernetes to move to a volume mount (Not finished)
 
 # Generate python bytecode files - they cannot be generated on the k8s because
 # Read-Only-Filesystems is enabled.
@@ -75,4 +75,4 @@ RUN cp src/core/janeway_global_settings.py src/core/settings.py
 # YOU MUST INSTALL JANEWAY BEFORE THE SITE WILL WORK. YOU CAN DO THIS BY EXEC-ING INTO THE CONTAINER AND
 # RUNNING /vol/janeway/src/manage.py install_janeway. This only needs to be done once. 
 
-ENTRYPOINT ["/vol/janeway/setup_scripts/install.sh"]
+ENTRYPOINT ["/vol/janeway/setup_scripts/run-k8s.sh"]
