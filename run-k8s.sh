@@ -31,11 +31,11 @@ if [[ "$JANEWAY_INSTALLED" == FALSE ]]; then
         exit 1
     fi
 
-    if [[ $USE_TYPESETTING_PLUGIN == TRUE ]]; then
+    if [[ $INSTALL_TYPESETTING_PLUGIN == TRUE ]]; then
         rm -rf /vol/janeway/src/plugins/typesetting
         cp -r /tmp/plugins/typesetting /vol/janeway/src/plugins
     fi
-    if [[ $USE_PANDOC_PLUGIN == TRUE ]]; then
+    if [[ $INSTALL_PANDOC_PLUGIN == TRUE ]]; then
         rm -rf /vol/janeway/src/plugins/pandoc_plugin
         cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
     fi
@@ -51,15 +51,15 @@ else
         if [[ "$INSTALLED_VERSION" != "$INCOMING_VERSION" ]]; then
             echo "Installed version $INSTALLED_VERSION is out of date; installing version $INCOMING_VERSION..."
 
-            if [[ $USE_TYPESETTING_PLUGIN == TRUE ]]; then
+            if [[ $INSTALL_TYPESETTING_PLUGIN == TRUE ]]; then
                 rm -rf /vol/janeway/src/plugins/typesetting
                 cp -r /tmp/plugins/typesetting /vol/janeway/src/plugins
             fi
-            if [[ $USE_PANDOC_PLUGIN == TRUE ]]; then
+            if [[ $INSTALL_PANDOC_PLUGIN == TRUE ]]; then
                 rm -rf /vol/janeway/src/plugins/pandoc_plugin
                 cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
             fi
-            
+
             python3 src/manage.py load_default_settings
             python3 src/manage.py update_repository_settings
             python3 src/manage.py install_plugins
