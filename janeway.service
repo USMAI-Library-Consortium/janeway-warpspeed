@@ -1,0 +1,17 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=janeway
+Group=janeway
+WorkingDirectory=/vol/janeway/src
+ExecStart=/opt/venv/bin/gunicorn \
+          --access-logfile - \
+          --threads 1 \
+          --workers 2 \
+          --bind unix:/vol/janeway/gunicorn.sock \
+          core.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

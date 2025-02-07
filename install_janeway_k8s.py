@@ -36,11 +36,14 @@ class Command(BaseCommand):
         :return: None
         """
 
+        print("Starting installer...")
+
         # As of v1.4 USE_I18N must be enabled.
         if not settings.USE_I18N:
             raise ImproperlyConfigured("USE_I18N must be enabled from v1.4 of Janeway.")
 
         call_command('migrate')
+        print("Migration Complete.")
         translation.activate('en')
         with transaction.atomic():
             press = press_models.Press.objects.first()
@@ -76,6 +79,7 @@ class Command(BaseCommand):
             print("Journal #1 has been saved.\n")
 
             call_command('show_configured_journals')
+            call_command('build_assets')
             print("Installing plugins.")
             call_command('install_plugins')
             print("Installing Cron jobs")
@@ -84,7 +88,7 @@ class Command(BaseCommand):
             except FileNotFoundError:
                 self.stderr.write("Error Installing cron")
 
-            call_command('createsuperuser')
+            call_command('createsuperuser', interactive=False, email=os.environ.get('JANEWAY_SUPERUSER_EMAIL', "test@noreply.com"))
 
             print('Open your browser to your new journal domain '
                 '{domain}/install/ to continue this setup process.'.format(
@@ -94,10 +98,6 @@ class Command(BaseCommand):
                             press.domain, journal.code)
                 )
             )
-
-            if options['dry_run'] is True:
-                print("This was a --dry-run, rolling back...")
-                raise SystemExit()
 
         # finally, clear the cache
         shared.clear_cache()

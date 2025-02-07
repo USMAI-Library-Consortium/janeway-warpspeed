@@ -12,9 +12,10 @@ MEDIA_ROOT = os.environ['MEDIA_DIR']
 # It also works in Docker because it will return true even if it receives a
 # boolean
 def convert_env_to_bool(env: str):
-    if env.upper() == 'TRUE' or env == True:
+    if not env: return False
+    if env.upper() == 'TRUE':
         return True
     else: return False
 # Enable ORCID to be configured by Kubernetes
-ENABLE_ORCID = convert_env_to_bool(os.environ['JANEWAY_ENABLE_ORCID'])
-EMAIL_USE_TLS = convert_env_to_bool(os.environ['JANEWAY_EMAIL_USE_TLS'])
+ENABLE_ORCID = convert_env_to_bool(os.environ.get('JANEWAY_ENABLE_ORCID'))
+EMAIL_USE_TLS = convert_env_to_bool(os.environ.get('JANEWAY_EMAIL_USE_TLS'))

@@ -18,6 +18,10 @@ This docker image is currently designed to use Postgres.
 11. INSTALL_TYPESETTING_PLUGIN: Whether to install the typesetting plugin - TRUE or FALSE
 12. INSTALL_PANDOC_PLUGIN: Whether to install the pandoc plugin - TRUE or FALSE
 13. INSTALL_CUSTOMSTYLING_PLUGIN: Whether to install the custom styling plugin - TRUE or FALSE
+14. INSTALL_PORTICO_PLUGIN: Whether to install the portico plugin - TRUE or FALSE
+15. INSTALL_IMPORTS_PLUGIN: Whether to install the imports plugin - TRUE or FALSE
+16. INSTALL_DOAJ_TRANSPORTER_PLUGIN: Whether to install the doaj_transporter plugin - TRUE or FALSE
+17. INSTALL_BACK_CONTENT_PLUGIN: Whether to install the back_content plugin - TRUE or FALSE
 
 ## Optional environment variables
 1. JANEWAY_JOURNAL_DESCRIPTION
