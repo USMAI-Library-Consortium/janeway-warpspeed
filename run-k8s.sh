@@ -95,22 +95,21 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
     fi
 
     cp -r /tmp/static/* $STATIC_DIR
-    cp /tmp/install_janeway_k8s.py ./src/utils/management/commands/
     python3 src/manage.py install_janeway_k8s 2>&1
     STATUS=$?
 
     if [[ $STATUS == "0" ]]; then
         echo "Install successful."
         mkdir -p /vol/janeway/db/state-data/
-        echo $DEPLOYMENT_VERSION > /vol/janeway/db/INSTALLED_DEPLOYMENT_VERSION
-        echo $JANEWAY_VERSION > /vol/janeway/db/INSTALLED_APPLICATION_VERSION
+        echo $DEPLOYMENT_VERSION > /vol/janeway/db/state-data/INSTALLED_DEPLOYMENT_VERSION
+        echo $JANEWAY_VERSION > /vol/janeway/db/state-data/INSTALLED_APPLICATION_VERSION
     else
         echo "Install Failed"
         exit 1
     fi
 else
     echo "Checking if Janeway deployment update is needed..."
-    INSTALLED_VERSION=$(cat /vol/janeway/db/INSTALLED_DEPLOYMENT_VERSION)
+    INSTALLED_VERSION=$(cat /vol/janeway/db/state-data/INSTALLED_DEPLOYMENT_VERSION)
     INCOMING_VERSION=$DEPLOYMENT_VERSION
 
     if [[ "$(printf '%s\n' "$INSTALLED_VERSION" "$INCOMING_VERSION" | sort -V | tail -n 1)" == "$INCOMING_VERSION" ]]; then
@@ -156,8 +155,8 @@ else
             python3 src/manage.py update_translation_fields
             python3 src/manage.py install_cron
             python3 src/manage.py clear_cache
-            echo $DEPLOYMENT_VERSION > /vol/janeway/db/INSTALLED_DEPLOYMENT_VERSION
-            echo $JANEWAY_VERSION > /vol/janeway/db/INSTALLED_APPLICATION_VERSION
+            echo $DEPLOYMENT_VERSION > /vol/janeway/db/state-data/INSTALLED_DEPLOYMENT_VERSION
+            echo $JANEWAY_VERSION > /vol/janeway/db/state-data/INSTALLED_APPLICATION_VERSION
         else
             echo "Janeway version up-to-date."
         fi
@@ -167,6 +166,7 @@ else
     fi
 fi
 
-service janeway start
-systemctl enable janeway
-systemctl start nginx
+cd /vol/janeway/src
+/opt/venv/bin/gunicorn --daemon --access-logfile - --threads 1 --workers 2 --bind unix:/tmp/gunicorn.sock core.wsgi:application
+ls -l /tmp/
+nginx -g 'daemon off;'

@@ -80,6 +80,7 @@ class Command(BaseCommand):
 
             call_command('show_configured_journals')
             call_command('build_assets')
+            call_command('collectstatic', interactive=False)
             print("Installing plugins.")
             call_command('install_plugins')
             print("Installing Cron jobs")
@@ -88,7 +89,7 @@ class Command(BaseCommand):
             except FileNotFoundError:
                 self.stderr.write("Error Installing cron")
 
-            call_command('createsuperuser', interactive=False, email=os.environ.get('JANEWAY_SUPERUSER_EMAIL', "test@noreply.com"))
+            call_command('createsuperuser', interactive=False, email=os.environ.get('DJANGO_SUPERUSER_EMAIL', "test@noreply.com"))
 
             print('Open your browser to your new journal domain '
                 '{domain}/install/ to continue this setup process.'.format(

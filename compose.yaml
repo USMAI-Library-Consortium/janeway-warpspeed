@@ -3,9 +3,9 @@ version: "3"
 services:
 
   janeway-postgres:
-    image: postgres:11
+    image: postgres:12
     volumes:
-      - ./janeway/db/postgres-data:/var/lib/postgresql/data
+      - ./dockervols/postgres-data:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}"
     environment:
@@ -21,7 +21,7 @@ services:
     ports:
       - "${PGADMIN_PORT}:80"
     volumes:
-      - ./db/pgadmin:/var/lib/pgadmin
+      - ./dockervols/pgadmin:/var/lib/pgadmin
     environment:
             - PGADMIN_DEFAULT_EMAIL=dev@janeway.systems
             - "PGADMIN_DEFAULT_PASSWORD=${DB_PASSWORD}"
@@ -42,13 +42,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - ./janeway/src:/vol/janeway/src
-      - ./janeway/lib:/vol/janeway/lib
-      - ./janeway/logs:/vol/janeway/logs
-      - ./janeway/db/janeway.sqlite3:/db/janeway.sqlite3
     ports:
       - "${JANEWAY_PORT}:8000"
+    volumes:
+      - ./dockervols/files:/vol/janeway/src/files
+      - ./dockervols/media:/var/www/janeway/media
+      - ./dockervols/collected-static:/var/www/janeway/collected-static
+      - ./dockervols/db:/vol/janeway/db
+      - ./dockervols/plugins:/vol/janeway/src/plugins
+      - ./dockervols/lib:/vol/janeway/lib
+      - ./dockervols/logs:/vol/janeway/logs
+      - ./dockervols/gunicorn:/vol/janeway/gunicorn
+      - ./dockervols/lib:/var/lib/nginx
+      - ./dockervols/deb-log:/var/log/nginx
+      - ./dockervols/run:/run
     environment:
       - DB_VENDOR
       - DB_HOST
@@ -57,7 +64,6 @@ services:
       - DB_USER
       - DB_NAME
       - PYTHONDONTWRITEBYTECODE=yes
-      - JANEWAY_SETTINGS_MODULE=core.dev_settings
       - NOSE_INCLUDE_EXE=1
       - JANEWAY_EMAIL_BACKEND
       - JANEWAY_EMAIL_HOST
@@ -69,21 +75,14 @@ services:
       - JANEWAY_PRESS_CONTACT
       - JANEWAY_JOURNAL_CODE
       - JANEWAY_JOURNAL_NAME
-      - STATIC_DIR
-      - MEDIA_DIR
-      - JANEWAY_SUPERUSER_USERNAME
-      - JANEWAY_SUPERUSER_EMAIL
+      - DJANGO_SUPERUSER_USERNAME
+      - DJANGO_SUPERUSER_EMAIL
       - DJANGO_SUPERUSER_PASSWORD
+      - JANEWAY_VERSION
+      - DEPLOYMENT_VERSION
     depends_on:
       - "start_dependencies"
 
-  janeway-sqlite:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: /bin/bash
-    volumes:
-      - ./janeway/db/janeway.sqlite:/var/lib/janeway.sqlite
   janeway-debug-smtp:
     # Use same python as janeway-web to reduce the number of images
     image: python:3.8

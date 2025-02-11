@@ -12,20 +12,10 @@ RUN apt-get install -y gettext pandoc cron postgresql-client \
 # Set environment variabes. 
 #------------------------------------------------------
 
-# Set the media directory. This is the default location, and it can 
-# be changed
-ENV MEDIA_DIR=/vol/janeway/src/media
-
-# Settings you can't overwrite with Kubernetes
-#----------------------------------------------------------
-# The path for the virtual environment
 ENV VENV_PATH=/opt/venv
-# Append the location of the virtual environment to the path
-# so that Apache can find the neccesary packages. This
-# makes it so that python-home is not neccesary
 ENV PATH="$VENV_PATH/bin:$PATH"
-# Set the static directory.
-ENV STATIC_DIR=/vol/janeway/src/collected-static
+ENV STATIC_DIR=/var/www/janway/collected-static
+ENV MEDIA_DIR=/var/www/janeway/media
 
 # Create the virtual environment
 RUN python3 -m venv $VENV_PATH
@@ -44,24 +34,28 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Add the rest of the source code
 
 # Copy Janeway code
-COPY ./janeway/src /vol/janeway/src
-# Copy static to temp file so it can be built and compiled
-COPY ./janeway/src/static /tmp/static
+COPY ./janeway/src/ /vol/janeway/src/
+# Copy static to temp folder. There's no direct use for this right now, but I'm envisioning a
+# possibility of having custom static files that also need to be copied into the /static/ 
+# directory to be compiled. In Kubernetes, this requires the static file to be empty to start, 
+# so we copy the files from /tmp/static to the src static directory in the run-k8s.sh script. 
+COPY ./janeway/src/static/ /tmp/static/
 # Copy custom settings file into Janeway
-COPY ./prod_settings.py /vol/janeway/src/core/
+COPY prod_settings.py /vol/janeway/src/core/
 # Copy kubernetes install and setup script into Janeway
 RUN mkdir /vol/janeway/kubernetes
-COPY ./run-k8s.sh /vol/janeway/kubernetes
-# Copy custom janeway install command into django commands
-# COPY ./install_janeway_k8s.py /tmp/ # WORKAROUND FOR COPYING ISSUE
-COPY ./install_janeway_k8s.py /vol/janeway/src/utils/management/commands/
+COPY run-k8s.sh /vol/janeway/kubernetes/
+# Copy auto-install auto-update janeway install command into django commands
+COPY install_janeway_k8s.py /vol/janeway/src/utils/management/commands/
 # Copy all installable plugins into a temp directory, to be installed later
-COPY ./plugins/* /tmp/plugins
-# Copy Gunicorn configuration file to autorun
-COPY ./janeway.service /etc/systemd/system
+COPY ./plugins/ /tmp/plugins/
 # Create nginx directory and copy configuration in there
-RUN mkdir -p /etc/nginx/sites-available
-COPY nginx.conf /etc/nginx/sites-available
+RUN mkdir -p /etc/nginx
+COPY nginx.conf /etc/nginx/
+# Create Janeway logs directory
+RUN mkdir -p /vol/janeway/logs
+RUN touch /vol/janeway/logs/janeway.log
+# Required in Docker-Compose, will be overwritten on Kubernetes
 
 # Generate python bytecode files - they cannot be generated on the k8s because
 # Read-Only-Filesystems is enabled.
@@ -74,7 +68,7 @@ RUN groupmod -g 9950 janeway
 RUN adduser janeway sudo
 
 # Static dir and media dir are added are specified in case they're not in /vol/janeway
-RUN mkdir ${STATIC_DIR} ${MEDIA_DIR}
+RUN mkdir -p ${STATIC_DIR} ${MEDIA_DIR}
 
 # Grant permissions to the user
 # ONLY PERMISSIONS FOR NON-MOUNTED VOLUMES APPLY TO KUBERNETES. For example, /vol/janeway
@@ -82,7 +76,8 @@ RUN mkdir ${STATIC_DIR} ${MEDIA_DIR}
 # You must set the permissions for mounted volumes in Kubernetes. This is done in the 
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
-RUN chown --recursive janeway:janeway /vol/janeway ${STATIC_DIR} ${MEDIA_DIR} /tmp
+RUN mkdir -p /var/lib/nginx
+RUN chown --recursive janeway:janeway /vol/janeway ${STATIC_DIR} ${MEDIA_DIR} /tmp /var/lib/nginx /var/log/nginx
 # Allow www-data to use cron
 RUN usermod -aG crontab janeway
 # Allow this file to be run
@@ -90,9 +85,6 @@ RUN chmod +x /vol/janeway/kubernetes/run-k8s.sh
 # Set the active user to the apache default
 USER janeway
 
-# Copy default global settings
-# RUN cp src/core/janeway_global_settings.py src/core/settings.py
-# RUN touch /vol/janeway/logs/janeway.log
 ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
 
 # Run image-side janeway setup info.
