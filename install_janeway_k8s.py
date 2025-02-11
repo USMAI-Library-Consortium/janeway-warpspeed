@@ -1,11 +1,11 @@
 import os
 
-from django.conf import settings
-from django.core.management.base import BaseCommand
-from django.core.management import call_command
-from django.db import transaction
-from django.utils import translation
-from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings # type: ignore
+from django.core.management.base import BaseCommand # type: ignore
+from django.core.management import call_command # type: ignore
+from django.db import transaction # type: ignore
+from django.utils import translation # type: ignore
+from django.core.exceptions import ImproperlyConfigured # type: ignore
 
 from press import models as press_models # type: ignore
 from journal import models as journal_models # type: ignore
