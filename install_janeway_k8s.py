@@ -81,6 +81,7 @@ class Command(BaseCommand):
             call_command('show_configured_journals')
             call_command('build_assets')
             call_command('collectstatic', interactive=False)
+            call_command('collectplugins')
             print("Installing plugins.")
             call_command('install_plugins')
             print("Installing Cron jobs")

@@ -1,5 +1,4 @@
-# Based on python 3.10 Debian
-FROM python:3.10
+FROM python:3.11
 SHELL ["/bin/bash", "-c"]
 
 # Install debian dependencies
@@ -14,7 +13,7 @@ RUN apt-get install -y gettext pandoc cron postgresql-client \
 
 ENV VENV_PATH=/opt/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
-ENV STATIC_DIR=/var/www/janway/collected-static
+ENV STATIC_DIR=/var/www/janeway/collected-static
 ENV MEDIA_DIR=/var/www/janeway/media
 
 # Create the virtual environment
@@ -35,11 +34,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 # Copy Janeway code
 COPY ./janeway/src/ /vol/janeway/src/
-# Copy static to temp folder. There's no direct use for this right now, but I'm envisioning a
-# possibility of having custom static files that also need to be copied into the /static/ 
-# directory to be compiled. In Kubernetes, this requires the static file to be empty to start, 
-# so we copy the files from /tmp/static to the src static directory in the run-k8s.sh script. 
-COPY ./janeway/src/static/ /tmp/static/
 # Copy custom settings file into Janeway
 COPY prod_settings.py /vol/janeway/src/core/
 # Copy kubernetes install and setup script into Janeway
@@ -47,8 +41,9 @@ RUN mkdir /vol/janeway/kubernetes
 COPY run-k8s.sh /vol/janeway/kubernetes/
 # Copy auto-install auto-update janeway install command into django commands
 COPY install_janeway_k8s.py /vol/janeway/src/utils/management/commands/
-# Copy all installable plugins into a temp directory, to be installed later
-COPY ./plugins/ /tmp/plugins/
+COPY collectplugins.py /vol/janeway/src/utils/management/commands/
+# Copy all installable plugins into a temp directory, to be collected and installed later
+COPY ./plugins/ /vol/janeway/src/available-plugins
 # Create nginx directory and copy configuration in there
 RUN mkdir -p /etc/nginx
 COPY nginx.conf /etc/nginx/
@@ -76,7 +71,8 @@ RUN mkdir -p ${STATIC_DIR} ${MEDIA_DIR}
 # You must set the permissions for mounted volumes in Kubernetes. This is done in the 
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
-RUN mkdir -p /var/lib/nginx
+RUN mkdir -p /var/lib/nginx /var/www/janeway/collected-static /var/www/janeway/media \
+    /var/www/janeway/additional-plugins /var/www/janeway/logs
 RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp /var/lib/nginx /var/log/nginx
 # Allow www-data to use cron
 RUN usermod -aG crontab janeway

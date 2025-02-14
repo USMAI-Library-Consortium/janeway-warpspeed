@@ -57,7 +57,7 @@ export JANEWAY_JOURNAL_NAME="New Test Journal"
 
 # Variables for Janeway state (controls auto-install and auto-update)
 export JANEWAY_VERSION=1.7.2
-export DEPLOYMENT_VERSION=0.1.0
+export DEPLOYMENT_VERSION=0.1.6
 
 export DJANGO_SUPERUSER_EMAIL=ejones99@umd.edu
 export DJANGO_SUPERUSER_USERNAME=ejones99

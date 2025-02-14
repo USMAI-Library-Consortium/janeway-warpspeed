@@ -57,44 +57,7 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
         echo "Missing required Janeway Journal Name environment variable."
         exit 1
     fi
-
-    if [[ $INSTALL_TYPESETTING_PLUGIN == "TRUE" ]]; then
-        echo "Installing Typesetting Plugin"
-        rm -rf /vol/janeway/src/plugins/typesetting
-        cp -r /tmp/plugins/typesetting /vol/janeway/src/plugins
-    fi
-    if [[ $INSTALL_PANDOC_PLUGIN == "TRUE" ]]; then
-        echo "Installing Pandoc Plugin"
-        rm -rf /vol/janeway/src/plugins/pandoc_plugin
-        cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
-    fi
-    if [[ $INSTALL_CUSTOMSTYLING_PLUGIN == "TRUE" ]]; then
-        echo "Installing Customstyling Plugin"
-        rm -rf /vol/janeway/src/plugins/customstyling
-        cp -r /tmp/plugins/customstyling /vol/janeway/src/plugins
-    fi
-    if [[ $INSTALL_PORTICO_PLUGIN == "TRUE" ]]; then
-        echo "Installing Portico Plugin"
-        rm -rf /vol/janeway/src/plugins/portico
-        cp -r /tmp/plugins/portico /vol/janeway/src/plugins
-    fi
-    if [[ $INSTALL_IMPORTS_PLUGIN == "TRUE" ]]; then
-        echo "Installing Imports Plugin"
-        rm -rf /vol/janeway/src/plugins/imports
-        cp -r /tmp/plugins/imports /vol/janeway/src/plugins
-    fi
-    if [[ $INSTALL_DOAJ_PLUGIN == "TRUE" ]]; then
-        echo "Installing doaj transporter plugin"
-        rm -rf /vol/janeway/src/plugins/doaj_transporter
-        cp -r /tmp/plugins/doaj_transporter /vol/janeway/src/plugins
-    fi
-    if [[ $INSTALL_BACK_CONTENT_PLUGIN == "TRUE" ]]; then
-        echo "Installing Back Content Plugin"
-        rm -rf /vol/janeway/src/plugins/back_content
-        cp -r /tmp/plugins/back_content /vol/janeway/src/plugins
-    fi
-
-    cp -r /tmp/static/* $STATIC_DIR
+    
     python3 src/manage.py install_janeway_k8s 2>&1
     STATUS=$?
 
@@ -117,40 +80,12 @@ else
         if [[ "$INSTALLED_VERSION" != "$INCOMING_VERSION" ]]; then
             echo "Deployment version $INSTALLED_VERSION is out of date; installing version $INCOMING_VERSION..."
 
-            if [[ $INSTALL_TYPESETTING_PLUGIN == TRUE ]]; then
-                rm -rf /vol/janeway/src/plugins/typesetting
-                cp -r /tmp/plugins/typesetting /vol/janeway/src/plugins
-            fi
-            if [[ $INSTALL_PANDOC_PLUGIN == TRUE ]]; then
-                rm -rf /vol/janeway/src/plugins/pandoc_plugin
-                cp -r /tmp/plugins/pandoc_plugin /vol/janeway/src/plugins
-            fi
-            if [[ $INSTALL_CUSTOMSTYLING_PLUGIN == TRUE ]]; then
-                rm -rf /vol/janeway/src/plugins/customstyling
-                cp -r /tmp/plugins/customstyling /vol/janeway/src/plugins
-            fi
-            if [[ $INSTALL_PORTICO_PLUGIN == TRUE ]]; then
-                rm -rf /vol/janeway/src/plugins/portico
-                cp -r /tmp/plugins/portico /vol/janeway/src/plugins
-            fi
-            if [[ $INSTALL_IMPORTS_PLUGIN == TRUE ]]; then
-                rm -rf /vol/janeway/src/plugins/imports
-                cp -r /tmp/plugins/imports /vol/janeway/src/plugins
-            fi
-            if [[ $INSTALL_BACK_CONTENT_PLUGIN == TRUE ]]; then
-                rm -rf /vol/janeway/src/plugins/back_content
-                cp -r /tmp/plugins/back_content /vol/janeway/src/plugins
-            fi
-
-            # Clear the static directory and put all the files in there.
-            rm -r $STATIC_DIR
-            cp -r tmp/static/* $STATIC_DIR
-
             python3 src/manage.py build_assets
             python3 src/manage.py collectstatic --no-input
             DJANGO_SETTINGS_MODULE=1 python3 src/manage.py compilemessages
             python3 src/manage.py load_default_settings
             python3 src/manage.py update_repository_settings
+            python3 src/manage.py collectplugins
             python3 src/manage.py install_plugins
             python3 src/manage.py update_translation_fields
             python3 src/manage.py install_cron

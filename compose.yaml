@@ -48,7 +48,11 @@ services:
       - ./dockervols/files:/vol/janeway/src/files
       - ./dockervols/plugins:/vol/janeway/src/plugins
       - ./dockervols/lib:/vol/janeway/lib
-      - ./dockervols/janeway:/var/www/janeway
+      - ./dockervols/janeway/collected-static:/var/www/janeway/collected-static
+      - ./dockervols/janeway/media:/var/www/janeway/media
+      - ./dockervols/janeway/logs:/var/www/janeway/logs
+      - ./dockervols/janeway/additional-plugins:/var/www/janeway/additional-plugins
+      - ./dockervols/janeway/state-data:/var/www/janeway/state-data
       - ./dockervols/lib:/var/lib/nginx
       - ./dockervols/run:/run
     environment:
@@ -75,6 +79,8 @@ services:
       - DJANGO_SUPERUSER_PASSWORD
       - JANEWAY_VERSION
       - DEPLOYMENT_VERSION
+      - INSTALL_PANDOC_PLUGIN=TRUE
+      - INSTALL_TYPESETTING_PLUGIN=TRUE
     depends_on:
       - "start_dependencies"
 
