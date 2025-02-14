@@ -1,4 +1,4 @@
-version: "3"
+version: "1"
 
 services:
 
@@ -46,15 +46,10 @@ services:
       - "${JANEWAY_PORT}:8000"
     volumes:
       - ./dockervols/files:/vol/janeway/src/files
-      - ./dockervols/media:/var/www/janeway/media
-      - ./dockervols/collected-static:/var/www/janeway/collected-static
-      - ./dockervols/db:/vol/janeway/db
       - ./dockervols/plugins:/vol/janeway/src/plugins
       - ./dockervols/lib:/vol/janeway/lib
-      - ./dockervols/logs:/vol/janeway/logs
-      - ./dockervols/gunicorn:/vol/janeway/gunicorn
+      - ./dockervols/janeway:/var/www/janeway
       - ./dockervols/lib:/var/lib/nginx
-      - ./dockervols/deb-log:/var/log/nginx
       - ./dockervols/run:/run
     environment:
       - DB_VENDOR

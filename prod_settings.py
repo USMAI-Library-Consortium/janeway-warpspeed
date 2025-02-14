@@ -1,4 +1,6 @@
 import os
+import sys
+from .janeway_global_settings import LOGGING # type: ignore
 
 # Set the static and media directories 
 STATIC_ROOT = "/var/www/janeway/collected-static"
@@ -23,5 +25,8 @@ EMAIL_USE_TLS = convert_env_to_bool(os.environ.get('JANEWAY_EMAIL_USE_TLS'))
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '.server.janeway.systems'
+    'janeway',
+    os.environ.get('JANEWAY_PRESS_DOMAIN')
 ]
+
+LOGGING['handlers']['log_file']['filename'] = "/var/www/janeway/logs/janeway.log"

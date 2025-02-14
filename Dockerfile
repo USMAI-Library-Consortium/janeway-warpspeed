@@ -77,7 +77,7 @@ RUN mkdir -p ${STATIC_DIR} ${MEDIA_DIR}
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
 RUN mkdir -p /var/lib/nginx
-RUN chown --recursive janeway:janeway /vol/janeway ${STATIC_DIR} ${MEDIA_DIR} /tmp /var/lib/nginx /var/log/nginx
+RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp /var/lib/nginx /var/log/nginx
 # Allow www-data to use cron
 RUN usermod -aG crontab janeway
 # Allow this file to be run
@@ -86,8 +86,5 @@ RUN chmod +x /vol/janeway/kubernetes/run-k8s.sh
 USER janeway
 
 ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
-
-# Run image-side janeway setup info.
-# RUN source ${VENV_PATH}/bin/activate && python3 src/manage.py compilemessages
 
 ENTRYPOINT ["/vol/janeway/kubernetes/run-k8s.sh"]
