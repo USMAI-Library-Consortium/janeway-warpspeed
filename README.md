@@ -53,7 +53,6 @@ There are many environment variables needed to make this application run properl
 7. INSTALL_IMPORTS_PLUGIN: Install the imports plugin - TRUE or FALSE, FALSE if not set
 8. INSTALL_DOAJ_TRANSPORTER_PLUGIN: Install the doaj_transporter plugin - TRUE or FALSE, FALSE if not set
 9. INSTALL_BACK_CONTENT_PLUGIN: Install the back_content plugin - TRUE or FALSE, FALSE if not set
-10: 
 
 ### Environment variables REQUIRED but Auto-Set 
 You must set these if you're using this docker image outside of the Helm Chart or outside of the built-in Compose.
