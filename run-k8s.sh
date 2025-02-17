@@ -41,29 +41,18 @@ fi
 
 if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
     # Ensure required environment variables are set
-    if [[ -z "$JANEWAY_PRESS_NAME" ]]; then
-        echo "Missing required Janeway Press Name environment variable."
-        exit 1
-    elif [[ -z "$JANEWAY_PRESS_DOMAIN" ]]; then
-        echo "Missing required Janeway Press Domain environment variable."
-        exit 1
-    elif [[ -z "$JANEWAY_PRESS_CONTACT" ]]; then
-        echo "Missing required Janeway Press Contact environment variable."
-        exit 1
-    elif [[ -z "$JANEWAY_JOURNAL_CODE" ]]; then
-        echo "Missing required Janeway Journal Code environment variable."
-        exit 1
-    elif [[ -z "$JANEWAY_JOURNAL_NAME" ]]; then
-        echo "Missing required Janeway Journal Name environment variable."
-        exit 1
-    fi
+    for var in JANEWAY_PRESS_NAME JANEWAY_PRESS_DOMAIN JANEWAY_PRESS_CONTACT JANEWAY_JOURNAL_CODE JANEWAY_JOURNAL_NAME; do
+        if [[ -z "${!var}" ]]; then
+            echo "Missing required environment variable: $var"
+            exit 1
+        fi
+    done
     
     python3 src/manage.py install_janeway_k8s 2>&1
     STATUS=$?
 
     if [[ $STATUS == "0" ]]; then
         echo "Install successful."
-        mkdir -p /var/www/janeway/state-data/
         echo $DEPLOYMENT_VERSION > /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION
         echo $JANEWAY_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
     else
@@ -71,34 +60,59 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
         exit 1
     fi
 else
+    # Janeway is installed.
     echo "Checking if Janeway deployment update is needed..."
-    INSTALLED_VERSION=$(cat /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION)
-    INCOMING_VERSION=$DEPLOYMENT_VERSION
+    INSTALLED_DEPLOYMENT_VERSION=$(cat /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION)
+    INCOMING_DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION
+    INSTALLED_APPLICATION_VERSION=$(cat /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION)
+    INCOMING_APPLICATION_VERSION=$JANEWAY_VERSION
 
-    if [[ "$(printf '%s\n' "$INSTALLED_VERSION" "$INCOMING_VERSION" | sort -V | tail -n 1)" == "$INCOMING_VERSION" ]]; then
-
-        if [[ "$INSTALLED_VERSION" != "$INCOMING_VERSION" ]]; then
-            echo "Deployment version $INSTALLED_VERSION is out of date; installing version $INCOMING_VERSION..."
-
-            python3 src/manage.py build_assets
-            python3 src/manage.py collectstatic --no-input
-            DJANGO_SETTINGS_MODULE=1 python3 src/manage.py compilemessages
-            python3 src/manage.py load_default_settings
-            python3 src/manage.py update_repository_settings
-            python3 src/manage.py collectplugins
-            python3 src/manage.py install_plugins
-            python3 src/manage.py update_translation_fields
-            python3 src/manage.py install_cron
-            python3 src/manage.py clear_cache
-            echo $DEPLOYMENT_VERSION > /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION
-            echo $JANEWAY_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
-        else
-            echo "Janeway version up-to-date."
-        fi
-    else
-        echo "FATAL ERROR; incoming Deployment version $INCOMING_VERSION is less than installed version $INSTALLED_VERSION"
+    # Deployment version check
+    # Throws error if the incoming version is less than the installed version
+    if [[ "$(printf '%s\n' "$INSTALLED_DEPLOYMENT_VERSION" "$INCOMING_DEPLOYMENT_VERSION" | sort --version-sort | tail --lines 1)" != "$INCOMING_DEPLOYMENT_VERSION" ]]; then
+        echo "FATAL ERROR: Incoming Deployment version $INCOMING_DEPLOYMENT_VERSION is less than installed version $INSTALLED_DEPLOYMENT_VERSION"
         exit 1
     fi
+
+    # Application version check
+    # Throws an error if the incoming version is less than the installed version.
+    if [[ "$(printf '%s\n' "$INSTALLED_APPLICATION_VERSION" "$INCOMING_APPLICATION_VERSION" | sort --version-sort | tail --lines 1)" != "$INCOMING_APPLICATION_VERSION" ]]; then
+        echo "FATAL ERROR: Incoming Janeway version $INCOMING_APPLICATION_VERSION is less than installed version $INSTALLED_APPLICATION_VERSION"
+        exit 1
+    fi
+
+    if [[ "$INSTALLED_DEPLOYMENT_VERSION" != "$INCOMING_DEPLOYMENT_VERSION" ]]; then
+
+        if [[ "$INSTALLED_APPLICATION_VERSION" != "$INCOMING_APPLICATION_VERSION" ]]; then
+            # Upgrade Janeway & plugins
+            echo "Upgrading Janeway from $INSTALLED_APPLICATION_VERSION to $INCOMING_APPLICATION_VERSION..."
+            python3 src/manage.py upgrade_janeway_k8s 2>&1
+            STATUS=$?
+            if [[ $STATUS == "0" ]]; then
+                echo "Upgrade successful!"
+                echo $INCOMING_APPLICATION_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
+            else
+                echo "FATAL ERROR: Upgrade Failed!"
+                exit 1
+            fi
+        else
+            # Upgrade plugins
+            echo "Janeway is up-to-date ($INSTALLED_APPLICATION_VERSION)."
+            echo "Running plugin update/install process..."
+            python3 src/manage.py collectplugins 2>&1
+            python3 src/manage.py install_plugins 2>&1
+            python3 src/manage.py migrate_plugins 2>&1
+            echo "Plugins upgraded successfully"
+        fi
+        # Compile plugins static files.
+        python3 -m compileall src/plugins 2>&1
+        echo $INCOMING_DEPLOYMENT_VERSION > /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION
+    else
+        echo "Everything up-to-date"
+    fi
+    # These need to be re-done each time the container restarts
+    python3 src/manage.py clear_cache 2>&1
+    python3 src/manage.py install_cron 2>&1
 fi
 
 cd /vol/janeway/src

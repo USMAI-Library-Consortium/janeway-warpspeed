@@ -40,8 +40,7 @@ COPY prod_settings.py /vol/janeway/src/core/
 RUN mkdir /vol/janeway/kubernetes
 COPY run-k8s.sh /vol/janeway/kubernetes/
 # Copy auto-install auto-update janeway install command into django commands
-COPY install_janeway_k8s.py /vol/janeway/src/utils/management/commands/
-COPY collectplugins.py /vol/janeway/src/utils/management/commands/
+COPY ./commands/ /vol/janeway/src/utils/management/commands/
 # Copy all installable plugins into a temp directory, to be collected and installed later
 COPY ./plugins/ /vol/janeway/src/available-plugins
 # Create nginx directory and copy configuration in there

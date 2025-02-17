@@ -3,7 +3,6 @@ import shutil
 
 from django.conf import settings # type: ignore
 from django.core.management.base import BaseCommand # type: ignore
-from django.core.management import call_command # type: ignore
 
 class Command(BaseCommand):
     """
@@ -91,8 +90,3 @@ class Command(BaseCommand):
 
         print(f"Plugins Collected: {', '.join(installed_plugins)}")
         print("Done collecting plugins.")
-
-
-            
-
-        
