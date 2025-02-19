@@ -30,6 +30,17 @@ RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=23.0.0,<24.0.0'
 # it for the pip3 install but not Janeway
 ENV PYTHONDONTWRITEBYTECODE=1
 
+# Copy all installable plugins into a temp directory, to be collected and installed later
+WORKDIR /vol/janeway/src/available-plugins
+RUN git clone https://github.com/openlibhums/pandoc_plugin.git --branch v1.0.0-RC-1
+RUN git clone https://github.com/openlibhums/typesetting.git --branch v1.7.0-RC-2
+RUN git clone https://github.com/openlibhums/back_content.git --branch v1.6.0-RC-1
+RUN git clone https://github.com/openlibhums/customstyling.git --branch v1.1.1
+RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master
+RUN git clone https://github.com/openlibhums/imports.git --branch v1.10
+RUN git clone https://github.com/openlibhums/portico.git --branch master
+RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
+
 # Add the rest of the source code
 
 # Copy Janeway code
@@ -41,8 +52,6 @@ RUN mkdir /vol/janeway/kubernetes
 COPY run-k8s.sh /vol/janeway/kubernetes/
 # Copy auto-install auto-update janeway install command into django commands
 COPY ./commands/ /vol/janeway/src/utils/management/commands/
-# Copy all installable plugins into a temp directory, to be collected and installed later
-COPY ./plugins/ /vol/janeway/src/available-plugins
 # Create nginx directory and copy configuration in there
 RUN mkdir -p /etc/nginx
 COPY nginx.conf /etc/nginx/

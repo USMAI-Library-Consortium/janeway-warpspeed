@@ -13,7 +13,7 @@ The main technical goals of this helm chart were to:
 Additional changes were made to optimize the Docker image for Kubernetes, such as:
 1. Identifying and consolidating dynamic data storage locations so that they can be persisted
 2. Logging to Standard Output
-3. Pre-package commonly used plugins, installable using environment variables
+3. Pre-package commonly used plugins, installable using environment variables.
 
 All setup and configuration options are set with environment variables. Please note the required environment variables. Also please note that this Docker image is only compatible with Postgres.
 
@@ -53,6 +53,7 @@ There are many environment variables needed to make this application run properl
 7. INSTALL_IMPORTS_PLUGIN: Install the imports plugin - TRUE or FALSE, FALSE if not set
 8. INSTALL_DOAJ_TRANSPORTER_PLUGIN: Install the doaj_transporter plugin - TRUE or FALSE, FALSE if not set
 9. INSTALL_BACK_CONTENT_PLUGIN: Install the back_content plugin - TRUE or FALSE, FALSE if not set
+9. INSTALL_REPORTING_PLUGIN: Install the reporting plugin - TRUE or FALSE, FALSE if not set
 
 ### Environment variables REQUIRED but Auto-Set 
 You must set these if you're using this docker image outside of the Helm Chart or outside of the built-in Compose.

@@ -53,26 +53,14 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
 
     if [[ $STATUS == "0" ]]; then
         echo "Install successful."
-        echo $DEPLOYMENT_VERSION > /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION
         echo $JANEWAY_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
     else
         echo "Install Failed"
         exit 1
     fi
 else
-    # Janeway is installed.
-    echo "Checking if Janeway deployment update is needed..."
-    INSTALLED_DEPLOYMENT_VERSION=$(cat /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION)
-    INCOMING_DEPLOYMENT_VERSION=$DEPLOYMENT_VERSION
     INSTALLED_APPLICATION_VERSION=$(cat /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION)
     INCOMING_APPLICATION_VERSION=$JANEWAY_VERSION
-
-    # Deployment version check
-    # Throws error if the incoming version is less than the installed version
-    if [[ "$(printf '%s\n' "$INSTALLED_DEPLOYMENT_VERSION" "$INCOMING_DEPLOYMENT_VERSION" | sort --version-sort | tail --lines 1)" != "$INCOMING_DEPLOYMENT_VERSION" ]]; then
-        echo "FATAL ERROR: Incoming Deployment version $INCOMING_DEPLOYMENT_VERSION is less than installed version $INSTALLED_DEPLOYMENT_VERSION"
-        exit 1
-    fi
 
     # Application version check
     # Throws an error if the incoming version is less than the installed version.
@@ -81,38 +69,27 @@ else
         exit 1
     fi
 
-    if [[ "$INSTALLED_DEPLOYMENT_VERSION" != "$INCOMING_DEPLOYMENT_VERSION" ]]; then
-
-        if [[ "$INSTALLED_APPLICATION_VERSION" != "$INCOMING_APPLICATION_VERSION" ]]; then
-            # Upgrade Janeway & plugins
-            echo "Upgrading Janeway from $INSTALLED_APPLICATION_VERSION to $INCOMING_APPLICATION_VERSION..."
-            python3 src/manage.py upgrade_janeway_k8s 2>&1
-            STATUS=$?
-            if [[ $STATUS == "0" ]]; then
-                echo "Upgrade successful!"
-                echo $INCOMING_APPLICATION_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
-            else
-                echo "FATAL ERROR: Upgrade Failed!"
-                exit 1
-            fi
+    if [[ "$INSTALLED_APPLICATION_VERSION" != "$INCOMING_APPLICATION_VERSION" ]]; then
+        # Upgrade Janeway & plugins
+        echo "Upgrading Janeway from $INSTALLED_APPLICATION_VERSION to $INCOMING_APPLICATION_VERSION..."
+        python3 src/manage.py upgrade_janeway_k8s 2>&1
+        STATUS=$?
+        if [[ $STATUS == "0" ]]; then
+            echo "Upgrade successful!"
+            echo $INCOMING_APPLICATION_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
         else
-            # Upgrade plugins
-            echo "Janeway is up-to-date ($INSTALLED_APPLICATION_VERSION)."
-            echo "Running plugin update/install process..."
-            python3 src/manage.py collectplugins 2>&1
-            python3 src/manage.py install_plugins 2>&1
-            python3 src/manage.py migrate_plugins 2>&1
-            echo "Plugins upgraded successfully"
+            echo "FATAL ERROR: Upgrade Failed!"
+            exit 1
         fi
-        # Compile plugins static files.
-        python3 -m compileall src/plugins 2>&1
-        echo $INCOMING_DEPLOYMENT_VERSION > /var/www/janeway/state-data/INSTALLED_DEPLOYMENT_VERSION
     else
-        echo "Everything up-to-date"
+        echo "Janeway is up-to-date ($INSTALLED_APPLICATION_VERSION)."
+
+        # Upgrade plugins
+        echo "Running plugin update/install process..."
+        python3 src/manage.py manage_plugins_k8s 2>&1
+        python3 src/manage.py clear_cache 2>&1
+        python3 src/manage.py install_cron 2>&1
     fi
-    # These need to be re-done each time the container restarts
-    python3 src/manage.py clear_cache 2>&1
-    python3 src/manage.py install_cron 2>&1
 fi
 
 cd /vol/janeway/src
