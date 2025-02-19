@@ -1,10 +1,10 @@
-# COPY THIS FILE TO src/core
-
 import os
+import sys
+from .janeway_global_settings import LOGGING # type: ignore
 
 # Set the static and media directories 
-STATIC_ROOT = os.environ['STATIC_DIR']
-MEDIA_ROOT = os.environ['MEDIA_DIR']
+STATIC_ROOT = "/var/www/janeway/collected-static"
+MEDIA_ROOT = "/var/www/janeway/media"
 
 # Kubernetes doesn't allow boolean environment variables, they're set as 
 # strings. Python doesn't seem to be able to convert them to booleans 
@@ -13,10 +13,20 @@ MEDIA_ROOT = os.environ['MEDIA_DIR']
 #
 # It also works in Docker because it will return true even if it receives a
 # boolean
-def convert_env_to_bool (env):
-    if env == 'True' or env == 'true' or env == True:
+def convert_env_to_bool(env: str):
+    if not env: return False
+    if env.upper() == 'TRUE':
         return True
     else: return False
 # Enable ORCID to be configured by Kubernetes
-ENABLE_ORCID = convert_env_to_bool(os.environ['JANEWAY_ENABLE_ORCID'])
-EMAIL_USE_TLS = convert_env_to_bool(os.environ['JANEWAY_EMAIL_USE_TLS'])
+ENABLE_ORCID = convert_env_to_bool(os.environ.get('JANEWAY_ENABLE_ORCID'))
+EMAIL_USE_TLS = convert_env_to_bool(os.environ.get('JANEWAY_EMAIL_USE_TLS'))
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'janeway',
+    os.environ.get('JANEWAY_PRESS_DOMAIN')
+]
+
+LOGGING['handlers']['log_file']['filename'] = "/var/www/janeway/logs/janeway.log"

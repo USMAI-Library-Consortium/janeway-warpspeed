@@ -1,117 +1,93 @@
-# Based on python 3.8 Debian
-FROM python:3.8
+FROM python:3.11
 SHELL ["/bin/bash", "-c"]
 
 # Install debian dependencies
 #------------------------------------------------------
 RUN apt-get update
-# These may not all be neccesary. Some of them were 
-# copied from an outdated config file. 
-RUN apt-get install -y gettext apache2 libxml2-dev \
-  libxslt1-dev python3-dev zlib1g-dev  \
-  libffi-dev libssl-dev libjpeg-dev apache2-utils \
-  apache2-dev pandoc pylint cron
+RUN apt-get install -y gettext pandoc cron postgresql-client \
+    libxml2-dev libxslt1-dev zlib1g-dev libffi-dev \
+    libssl-dev libjpeg-dev nginx
 
 # Set environment variabes. 
 #------------------------------------------------------
 
-# Settings overwriteable with Kubernetes
-#--
-# Set the Janeway Config File
-ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
-# Set the domain name for apache. This will be the servername
-# and the WSGI Daemon Process and WSGI Process Group names as well
-ENV APACHE_DOMAIN=localhost
-#
-# FOR THE FOLLOWING 2 SETTINGS, these should be folders that are only
-# used for these purposes. There should be nothing in them by default,
-# and they shouldn't be used by other programs. For instance, MEDIA_DIR
-# can't be /media, as that's a pre-existing folder used by Debian. 
-#
-# Set the static directory. This is the default location, and it can
-# be changed. 
-ENV STATIC_DIR=/vol/janeway/src/collected-static
-# Set the media directory. This is the default location, and it can 
-# be changed
-ENV MEDIA_DIR=/vol/janeway/src/media
-
-# Settings you can't overwrite with Kubernetes
-#--
-# The path for the virtual environment
 ENV VENV_PATH=/opt/venv
-# Append the location of the virtual environment to the path
-# so that Apache can find the neccesary packages. This
-# makes it so that python-home is not neccesary
 ENV PATH="$VENV_PATH/bin:$PATH"
-# Set if the orchestrator is kuberentes. If set to true, the /src/static
-# folder will be copied into /src/temp_static. Kubernetes will then copy
-# this folder back into static, which will have a non-persistant volume 
-# mount (emptyDir) (Not finished)
-# ENV ORCHESTRATOR_IS_KUBERNETES=true
+ENV STATIC_DIR=/var/www/janeway/collected-static
+ENV MEDIA_DIR=/var/www/janeway/media
 
 # Create the virtual environment
 RUN python3 -m venv $VENV_PATH
 
 # Install Python required packages
 WORKDIR /vol/janeway
+RUN mkdir gunicorn
 ADD ./janeway/requirements.txt /vol/janeway
 RUN source ${VENV_PATH}/bin/activate && pip3 install -r requirements.txt
-RUN source ${VENV_PATH}/bin/activate && pip3 install mod_wsgi
+RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=23.0.0,<24.0.0'
 # Don't generate pycache files for the Janeway installation internally -
 # That's why its not with the other ENV Variables - I'm allowing
 # it for the pip3 install but not Janeway
 ENV PYTHONDONTWRITEBYTECODE=1
 
+# Copy all installable plugins into a temp directory, to be collected and installed later
+WORKDIR /vol/janeway/src/available-plugins
+RUN git clone https://github.com/openlibhums/pandoc_plugin.git --branch v1.0.0-RC-1
+RUN git clone https://github.com/openlibhums/typesetting.git --branch v1.7.0-RC-2
+RUN git clone https://github.com/openlibhums/back_content.git --branch v1.6.0-RC-1
+RUN git clone https://github.com/openlibhums/customstyling.git --branch v1.1.1
+RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master
+RUN git clone https://github.com/openlibhums/imports.git --branch v1.10
+RUN git clone https://github.com/openlibhums/portico.git --branch master
+RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
+
 # Add the rest of the source code
-COPY ./janeway/src /vol/janeway/src
-COPY prod_settings.py /vol/janeway/src/core
-COPY wsgi.py /vol/janeway/src/core
-COPY ./janeway/setup_scripts /vol/janeway/setup_scripts
-COPY ./plugins/pandoc_plugin /vol/janeway/src/plugins/pandoc_plugin
-COPY ./plugins/typesetting /vol/janeway/src/plugins/typesetting
-# move the static files into temp-static 
-# for kubernetes to move to a volume mount (Not finished)
+# Copy Janeway code
+COPY ./janeway/src/ /vol/janeway/src/
+# Copy custom settings file into Janeway
+COPY prod_settings.py /vol/janeway/src/core/
+# Copy kubernetes install and setup script into Janeway
+RUN mkdir /vol/janeway/kubernetes
+COPY run-k8s.sh /vol/janeway/kubernetes/
+# Copy auto-install auto-update janeway install command into django commands
+COPY ./commands/ /vol/janeway/src/utils/management/commands/
+# Create nginx directory and copy configuration in there
+RUN mkdir -p /etc/nginx
+COPY nginx.conf /etc/nginx/
+# Create Janeway logs directory
+RUN mkdir -p /vol/janeway/logs
+RUN touch /vol/janeway/logs/janeway.log
+# Required in Docker-Compose, will be overwritten on Kubernetes
 
-# Generate python bytecode files
-RUN source ${VENV_PATH}/bin/activate && python3 -m compileall /vol/janeway
+# Generate python bytecode files - they cannot be generated on the k8s because
+# Read-Only-Filesystems is enabled.
+RUN source ${VENV_PATH}/bin/activate && python3 -m compileall .
 
-# Grant permissions to the www-data user & the www-data group, which are the default
-# user and group for apache
+# Create user to run the janeway application
+RUN adduser janeway
+RUN groupmod -g 9950 janeway
+# Make Janeway a sudoer
+RUN adduser janeway sudo
+
 # Static dir and media dir are added are specified in case they're not in /vol/janeway
-RUN mkdir /var/run/apache2 ${STATIC_DIR} ${MEDIA_DIR} 
+RUN mkdir -p ${STATIC_DIR} ${MEDIA_DIR}
+
+# Grant permissions to the user
 # ONLY PERMISSIONS FOR NON-MOUNTED VOLUMES APPLY TO KUBERNETES. For example, /vol/janeway
 # is stored on the image, while /db will be mounted with a Kubernetes Persistent Volume. 
 # You must set the permissions for mounted volumes in Kubernetes. This is done in the 
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
-RUN chown -R www-data:www-data /vol/janeway /etc/apache2 \
-  /var/lib/apache2 /var/log/apache2 /var/run/apache2 \
-  ${STATIC_DIR} ${MEDIA_DIR}
+RUN mkdir -p /var/lib/nginx /var/www/janeway/collected-static /var/www/janeway/media \
+    /var/www/janeway/additional-plugins /var/www/janeway/logs
+RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp /var/lib/nginx /var/log/nginx
 # Allow www-data to use cron
-RUN usermod -aG crontab www-data
+RUN usermod -aG crontab janeway
+# Allow this file to be run
+RUN chmod +x /vol/janeway/kubernetes/run-k8s.sh
 # Set the active user to the apache default
-USER www-data
+USER janeway
 
-WORKDIR /etc/apache2/sites-available
-# Move the apache configuration (called 000-janeway.conf) to the location for apache sites
-ADD 000-janeway.conf .
-# Deactivate the default apache site and enable janeway. Also enable rewrite rules.
-RUN a2dissite 000-default && a2ensite 000-janeway.conf && a2enmod rewrite
-WORKDIR /etc/apache2/
-# Replace the ports.conf so apache listens on the right port
-RUN rm ports.conf 
-ADD ports.conf .
+ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
 
-# Set the working directory back to the code repo for convenience
-WORKDIR /vol/janeway
-RUN cp src/core/janeway_global_settings.py src/core/settings.py
-
-# YOU MUST INSTALL JANEWAY BEFORE THE SITE WILL WORK. YOU CAN DO THIS BY EXEC-ING INTO THE CONTAINER AND
-# RUNNING /vol/janeway/src/manage.py install_janeway. This only needs to be done once. 
-
-ENV APACHE_PORT=8000
-EXPOSE ${APACHE_PORT}
-STOPSIGNAL SIGINT
-ENTRYPOINT ["/usr/sbin/apache2ctl"]
-# Runs apache in the forground so docker doesn't immediately exit
-CMD ["-D", "FOREGROUND"]
+ENTRYPOINT ["/vol/janeway/kubernetes/run-k8s.sh"]
