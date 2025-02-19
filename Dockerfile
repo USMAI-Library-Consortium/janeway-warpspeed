@@ -42,7 +42,6 @@ RUN git clone https://github.com/openlibhums/portico.git --branch master
 RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
 
 # Add the rest of the source code
-
 # Copy Janeway code
 COPY ./janeway/src/ /vol/janeway/src/
 # Copy custom settings file into Janeway
