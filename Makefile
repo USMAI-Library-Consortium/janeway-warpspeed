@@ -49,18 +49,18 @@ export JANEWAY_EMAIL_USE_TLS
 export JANEWAY_ENABLE_ORCID
 
 # Install variables
-export JANEWAY_PRESS_NAME=TestPress
-export JANEWAY_PRESS_DOMAIN=http://testpress.com
-export JANEWAY_PRESS_CONTACT=ejones99@umd.edu
+export JANEWAY_PRESS_NAME=Test Press
+export JANEWAY_PRESS_DOMAIN=localhost:8000
+export JANEWAY_PRESS_CONTACT=test@example.com
 export JANEWAY_JOURNAL_CODE=test_press
-export JANEWAY_JOURNAL_NAME="New Test Journal"
+export JANEWAY_JOURNAL_NAME=New Test Journal
 
 # Variables for Janeway state (controls auto-install and auto-update)
 export JANEWAY_VERSION=1.7.2
 export DEPLOYMENT_VERSION=0.1.0
 
-export DJANGO_SUPERUSER_EMAIL=ejones99@umd.edu
-export DJANGO_SUPERUSER_USERNAME=ejones99
+export DJANGO_SUPERUSER_EMAIL=test@example.com
+export DJANGO_SUPERUSER_USERNAME=johndoe
 export DJANGO_SUPERUSER_PASSWORD=SuperSecureJaneway1234
 
 SUFFIX ?= $(shell date +%s)
