@@ -4,6 +4,7 @@ import subprocess
 
 from django.core.management.base import BaseCommand # type: ignore
 from django.core.management import call_command # type: ignore
+from utils.k8s_shared import convert_to_bool # type: ignore
 
 class Command(BaseCommand):
     """
@@ -69,13 +70,6 @@ class Command(BaseCommand):
         # Copy the incoming plugin to the plugins directory
         shutil.copytree(incoming_plugin, existing_plugin)
         return return_code
-    
-    @staticmethod
-    def convert_to_bool(var_name: str) -> bool:
-        """Converts an environment variable to a boolean."""
-        val = os.environ.get(var_name, False)
-        if val and val.upper() == "TRUE": return True
-        return False
 
     def handle(self, *args, **options):
         """Collects plugins to be used.
@@ -86,10 +80,6 @@ class Command(BaseCommand):
         """
         print("Collecting Plugins...")
 
-        # Track whether to run the plugin install/upgrade process
-        run_install = False
-        run_update = False
-
         # Track which plugins were installed / upgraded
         installed_plugins = []
         updated_plugins = []
@@ -98,7 +88,7 @@ class Command(BaseCommand):
             base_plugin_name_for_env = available_plugin_name.removesuffix("_plugin")
             install_plugin_env_name = f"INSTALL_{base_plugin_name_for_env.upper()}_PLUGIN"
 
-            if self.convert_to_bool(install_plugin_env_name):
+            if convert_to_bool(install_plugin_env_name):
                 print(f"Built-in plugin {available_plugin_name} is requested to be installed via environment variable.")
                 
                 if os.path.exists(f"/var/www/janeway/additional-plugins/{available_plugin_name}"):
@@ -108,10 +98,8 @@ class Command(BaseCommand):
                 action_taken = self.overwrite_plugin(available_plugin_name)
                 if action_taken == "install": 
                     installed_plugins.append(available_plugin_name)
-                    run_install = True
                 if action_taken == "update":
                     updated_plugins.append(available_plugin_name)
-                    run_update = True
 
         # Transfer over custom plugins
         for additional_plugin_name in os.listdir("/var/www/janeway/additional-plugins"):
@@ -124,23 +112,16 @@ class Command(BaseCommand):
                 
                 # Clear the existing plugin to be overwritten if the incoming plugin is newer than the existing one.
                 shutil.rmtree(existing_plugin)
-                run_update = True
                 updated_plugins.append(additional_plugin_name)
             else:
-                run_install = True
                 installed_plugins.append(f"{additional_plugin_name} (from additional-plugins)")
             
             shutil.copytree(incoming_plugin, existing_plugin)
         
         os.system("python3 -m compileall -q /vol/janeway/src/plugins")
-        
-        if run_install:
-            call_command("install_plugins")
-            print(f"Plugins Installed: {', '.join(installed_plugins)}")
-        else:
-            print("No plugins to install.")
-        if run_update:
-            call_command("migrate_plugins")
-            print(f"Plugins Updated: {', '.join(updated_plugins)}")
-        else:
-            print("No plugins to update.")
+
+        call_command("install_plugins")
+        if installed_plugins: print(f"Plugins Installed: {', '.join(installed_plugins)}")
+
+        call_command("migrate_plugins")
+        if updated_plugins: print(f"Plugins Updated: {', '.join(updated_plugins)}")

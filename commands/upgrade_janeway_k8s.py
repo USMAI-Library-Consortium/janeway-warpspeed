@@ -1,5 +1,8 @@
+import os
+
 from django.core.management.base import BaseCommand # type: ignore
 from django.core.management import call_command # type: ignore
+from utils.k8s_shared import convert_to_bool # type: ignore
 
 class Command(BaseCommand):
     """
@@ -23,9 +26,19 @@ class Command(BaseCommand):
         call_command("build_assets")
         call_command("collectstatic", interactive=False)
         call_command("load_default_settings")
-        call_command("update_repository_settings")
+        os.system("python3 src/manage.py update_repository_settings")
         call_command("manage_plugins_k8s")
         call_command("update_translation_fields")
         call_command("clear_cache")
-        call_command("install_cron")
+
+        if convert_to_bool("INSTALL_CRON"):
+            print("Installing")
+            try:
+                call_command('install_cron')
+            except FileNotFoundError:
+                print("Error Installing cron")
+                self.stderr.write("Error Installing cron")
+        else:
+            print("Internal Cron installation disabled.")
+            
         call_command("populate_history", "cms.Page", "comms.NewsItem", "repository.Repository")

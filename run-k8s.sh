@@ -88,7 +88,13 @@ else
         echo "Running plugin update/install process..."
         python3 src/manage.py manage_plugins_k8s 2>&1
         python3 src/manage.py clear_cache 2>&1
-        python3 src/manage.py install_cron 2>&1
+
+        if [[ $INSTALL_CRON == "TRUE" ]]; then
+            python3 src/manage.py install_cron 2>&1
+        else
+            echo "Internal Cron installation disabled."
+        fi
+        
     fi
 fi
 

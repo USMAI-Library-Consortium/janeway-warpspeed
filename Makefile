@@ -62,6 +62,8 @@ export DJANGO_SUPERUSER_EMAIL=test@example.com
 export DJANGO_SUPERUSER_USERNAME=johndoe
 export DJANGO_SUPERUSER_PASSWORD=SuperSecureJaneway1234
 
+export INSTALL_CRON=TRUE
+
 SUFFIX ?= $(shell date +%s)
 SUFFIX := ${SUFFIX}
 DATE := `date +"%y-%m-%d"`
@@ -74,8 +76,16 @@ help:		## Show this help.
 janeway:	## Run Janeway web server in attached mode. If NO_DEPS is not set, runs all dependant services detached.
 	docker-compose build
 	docker-compose run --rm start_dependencies
-	docker-compose $(_VERBOSE) run $(NO_DEPS) --rm --service-ports janeway-web $(entrypoint)
+	-docker-compose $(_VERBOSE) run $(NO_DEPS) --rm --service-ports janeway-web || true
+	make down
 uninstall:	## Removes all janeway related docker containers, docker images and database volumes
 	@bash -c "rm -rf ./dockervols/*"
 	@bash -c "docker ps --filter 'name=janeway*' -aq | xargs -r docker rm -f >/dev/null 2>&1 || true"
 	@echo " Janeway has been uninstalled"
+down:
+	docker-compose down
+shell:		## Runs the janeway-web service and web server, then shell in
+	docker-compose run --rm start_dependencies
+	docker-compose up -d janeway-web
+	-docker-compose exec janeway-web /bin/bash || true
+	make down

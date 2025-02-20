@@ -55,6 +55,7 @@ services:
       - ./dockervols/janeway/state-data:/var/www/janeway/state-data
       - ./dockervols/lib:/var/lib/nginx
       - ./dockervols/run:/run
+      - ./dockervols/cron:/var/spool/cron/crontabs
     environment:
       - DB_VENDOR
       - DB_HOST
@@ -78,8 +79,15 @@ services:
       - DJANGO_SUPERUSER_EMAIL
       - DJANGO_SUPERUSER_PASSWORD
       - JANEWAY_VERSION
-      - INSTALL_PANDOC_PLUGIN=TRUE
-      - INSTALL_TYPESETTING_PLUGIN=TRUE
+      - INSTALL_CRON
+      - INSTALL_TYPESETTING_PLUGIN=False
+      - INSTALL_PANDOC_PLUGIN=False
+      - INSTALL_CUSTOMSTYLING_PLUGIN=False
+      - INSTALL_PORTICO_PLUGIN=False
+      - INSTALL_IMPORTS_PLUGIN=False
+      - INSTALL_DOAJ_TRANSPORTER_PLUGIN=False
+      - INSTALL_BACK_CONTENT_PLUGIN=False
+      - INSTALL_REPORTING_PLUGIN=False
     depends_on:
       - "start_dependencies"
 

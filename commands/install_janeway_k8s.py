@@ -6,6 +6,7 @@ from django.core.management import call_command # type: ignore
 from django.db import transaction # type: ignore
 from django.utils import translation # type: ignore
 from django.core.exceptions import ImproperlyConfigured # type: ignore
+from utils.k8s_shared import convert_to_bool # type: ignore
 
 from press import models as press_models # type: ignore
 from journal import models as journal_models # type: ignore
@@ -81,13 +82,19 @@ class Command(BaseCommand):
             call_command('show_configured_journals')
             call_command('build_assets')
             call_command('collectstatic', interactive=False)
-            call_command('manage_plugins_k8s')
-            try:
-                call_command('install_cron')
-            except FileNotFoundError:
-                self.stderr.write("Error Installing cron")
-
             call_command('createsuperuser', interactive=False, email=os.environ.get('DJANGO_SUPERUSER_EMAIL', "test@noreply.com"))
+            os.system(f"echo {os.environ.get('JANEWAY_VERSION')} > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION")
+
+            call_command('manage_plugins_k8s')
+
+            if convert_to_bool("INSTALL_CRON"):
+                print("True")
+                try:
+                    call_command('install_cron')
+                except FileNotFoundError:
+                    self.stderr.write("Error Installing cron")
+            else:
+                print("Internal Cron installation disabled.")
 
             print('Open your browser to your new journal domain '
                 '{domain}/install/ to continue this setup process.'.format(
