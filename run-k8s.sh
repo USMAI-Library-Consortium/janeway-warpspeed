@@ -2,10 +2,12 @@
 set -e
 
 # Ensure required environment variables are set
-if [[ -z "$DB_HOST" || -z "$DB_PORT" || -z "$DB_NAME" || -z "$DB_USER" || -z "$DB_PASSWORD" ]]; then
-    echo "Missing required environment variables for DB connection."
-    exit 1
-fi
+for var in DB_HOST DB_PORT DB_NAME DB_USER DB_PASSWORD JANEWAY_VERSION JANEWAY_PORT JANEWAY_PRESS_DOMAIN; do
+    if [[ -z "${!var}" ]]; then
+        echo "Missing required environment variable: $var"
+        exit 1
+    fi
+done
 
 # Check if the database exists
 export PGPASSWORD=$DB_PASSWORD
@@ -99,5 +101,4 @@ else
 fi
 
 cd /vol/janeway/src
-mkdir -p /var/www/janeway/logs
 /opt/venv/bin/gunicorn --access-logfile - --error-logfile - --threads 1 --workers 2 --bind 0.0.0.0:$JANEWAY_PORT core.wsgi:application

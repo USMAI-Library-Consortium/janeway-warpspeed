@@ -1,5 +1,4 @@
 import os
-import sys
 from utils.k8s_shared import convert_to_bool # type: ignore
 from .janeway_global_settings import LOGGING # type: ignore
 
@@ -17,5 +16,9 @@ ALLOWED_HOSTS = [
     'janeway',
     os.environ.get('JANEWAY_PRESS_DOMAIN')
 ]
+
+journal_domain = os.environ.get('JANEWAY_JOURNAL_DOMAIN', False)
+if journal_domain:
+    ALLOWED_HOSTS.append(journal_domain)
 
 LOGGING['handlers']['log_file']['filename'] = "/var/www/janeway/logs/janeway.log"
