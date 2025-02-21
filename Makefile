@@ -1,12 +1,11 @@
 # Exposed ports
-JANEWAY_PORT ?= 8000
-PGADMIN_PORT ?= 8001
+JANEWAY_PORT=8000
+PGADMIN_PORT=8001
 
 # Other required settings
 JANEWAY_ENABLE_ORCID=False
 
 unexport NO_DEPS
-DB_NAME ?= janeway
 DB_NAME ?= janeway
 DB_HOST=janeway-postgres
 DB_PORT=5432
@@ -50,9 +49,9 @@ export JANEWAY_ENABLE_ORCID
 
 # Install variables
 export JANEWAY_PRESS_NAME=Test Press
-export JANEWAY_PRESS_DOMAIN=localhost:8000
+export JANEWAY_PRESS_DOMAIN=localhost:${JANEWAY_PORT}
 export JANEWAY_PRESS_CONTACT=test@example.com
-export JANEWAY_JOURNAL_CODE=test_press
+export JANEWAY_JOURNAL_CODE=test_journal
 export JANEWAY_JOURNAL_NAME=New Test Journal
 
 # Variables for Janeway state (controls auto-install and auto-update)
@@ -75,8 +74,9 @@ help:		## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 janeway:	## Run Janeway web server in attached mode. If NO_DEPS is not set, runs all dependant services detached.
 	docker-compose build
-	docker-compose run --rm start_dependencies
-	-docker-compose $(_VERBOSE) run $(NO_DEPS) --rm --service-ports janeway-web || true
+	-docker-compose run --rm start_janeway_dependencies || true
+	-docker-compose run --rm start_nginx_dependencies || true
+	-docker-compose up || true
 	make down
 uninstall:	## Removes all janeway related docker containers, docker images and database volumes
 	@bash -c "rm -rf ./dockervols/*"
@@ -85,7 +85,7 @@ uninstall:	## Removes all janeway related docker containers, docker images and d
 down:
 	docker-compose down
 shell:		## Runs the janeway-web service and web server, then shell in
-	docker-compose run --rm start_dependencies
+	docker-compose run --rm start_janeway_dependencies
 	docker-compose up -d janeway-web
 	-docker-compose exec janeway-web /bin/bash || true
 	make down

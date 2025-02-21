@@ -6,7 +6,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update
 RUN apt-get install -y gettext pandoc cron postgresql-client \
     libxml2-dev libxslt1-dev zlib1g-dev libffi-dev \
-    libssl-dev libjpeg-dev nginx
+    libssl-dev libjpeg-dev
 
 # Set environment variabes. 
 #------------------------------------------------------
@@ -53,9 +53,6 @@ COPY run-k8s.sh /vol/janeway/kubernetes/
 COPY ./commands/ /vol/janeway/src/utils/management/commands/
 # Copy additional shared functions into the utils folder
 COPY k8s_shared.py /vol/janeway/src/utils/
-# Create nginx directory and copy configuration in there
-RUN mkdir -p /etc/nginx
-COPY nginx.conf /etc/nginx/
 # Create Janeway logs directory
 RUN mkdir -p /vol/janeway/logs
 RUN touch /vol/janeway/logs/janeway.log
@@ -80,9 +77,9 @@ RUN mkdir -p ${STATIC_DIR} ${MEDIA_DIR}
 # You must set the permissions for mounted volumes in Kubernetes. This is done in the 
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
-RUN mkdir -p /var/lib/nginx /var/www/janeway/collected-static /var/www/janeway/media \
+RUN mkdir -p /var/www/janeway/collected-static /var/www/janeway/media \
     /var/www/janeway/additional-plugins /var/www/janeway/logs
-RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp /var/lib/nginx /var/log/nginx
+RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp
 # Allow www-data to use cron
 RUN usermod -aG crontab janeway
 # Allow this file to be run

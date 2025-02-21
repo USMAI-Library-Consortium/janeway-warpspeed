@@ -4,6 +4,8 @@ services:
 
   janeway-postgres:
     image: postgres:12
+    networks:
+      - janeway-net
     volumes:
       - ./dockervols/postgres-data:/var/lib/postgresql/data
     ports:
@@ -17,33 +19,52 @@ services:
 
   janeway-pgadmin:
     image: dpage/pgadmin4
+    networks:
+      - janeway-net
     user: root
     ports:
       - "${PGADMIN_PORT}:80"
     volumes:
       - ./dockervols/pgadmin:/var/lib/pgadmin
     environment:
-            - PGADMIN_DEFAULT_EMAIL=dev@janeway.systems
-            - "PGADMIN_DEFAULT_PASSWORD=${DB_PASSWORD}"
-            - PG_ADMIN_LISTEN_ADDRESS=0.0.0.0
-            - GUNICORN_THREADS=2
-            - PGADMIN_SERVER_JSON_FILE=/var/lib/pgadmin/servers.json
-            - PGADMIN_CONFIG_SERVER_MODE=False
-            - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_DEFAULT_EMAIL=dev@janeway.systems
+      - "PGADMIN_DEFAULT_PASSWORD=${DB_PASSWORD}"
+      - PG_ADMIN_LISTEN_ADDRESS=0.0.0.0
+      - GUNICORN_THREADS=2
+      - PGADMIN_SERVER_JSON_FILE=/var/lib/pgadmin/servers.json
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
 
-  start_dependencies:
+  janeway-debug-smtp:
+    # Use same python as janeway-web to reduce the number of images
+    networks:
+      - janeway-net
+    image: python:3.8
+    entrypoint: python -u -m smtpd -c DebuggingServer -n 0.0.0.0:1025
+
+  start_janeway_dependencies:
     image: dadarek/wait-for-dependencies
+    networks:
+      - janeway-net
     depends_on:
      - "janeway-postgres"
      - janeway-debug-smtp
     command: "janeway-postgres:${DB_PORT}"
 
+  start_nginx_dependencies:
+    image: dadarek/wait-for-dependencies
+    networks:
+      - janeway-net
+    depends_on:
+     - "janeway-web"
+    command: "janeway-web:${JANEWAY_PORT}"
+
   janeway-web:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "${JANEWAY_PORT}:8000"
+    networks:
+      - janeway-net
     volumes:
       - ./dockervols/files:/vol/janeway/src/files
       - ./dockervols/plugins:/vol/janeway/src/plugins
@@ -53,7 +74,6 @@ services:
       - ./dockervols/janeway/logs:/var/www/janeway/logs
       - ./dockervols/janeway/additional-plugins:/var/www/janeway/additional-plugins
       - ./dockervols/janeway/state-data:/var/www/janeway/state-data
-      - ./dockervols/lib:/var/lib/nginx
       - ./dockervols/run:/run
       - ./dockervols/cron:/var/spool/cron/crontabs
     environment:
@@ -63,6 +83,7 @@ services:
       - DB_PASSWORD
       - DB_USER
       - DB_NAME
+      - JANEWAY_PORT
       - PYTHONDONTWRITEBYTECODE=yes
       - NOSE_INCLUDE_EXE=1
       - JANEWAY_EMAIL_BACKEND
@@ -89,9 +110,20 @@ services:
       - INSTALL_BACK_CONTENT_PLUGIN=False
       - INSTALL_REPORTING_PLUGIN=False
     depends_on:
-      - "start_dependencies"
+      - "start_janeway_dependencies"
 
-  janeway-debug-smtp:
-    # Use same python as janeway-web to reduce the number of images
-    image: python:3.8
-    entrypoint: python -u -m smtpd -c DebuggingServer -n 0.0.0.0:1025
+  janeway-nginx:
+    ports:
+      - "${JANEWAY_PORT}:${JANEWAY_PORT}"
+    image: nginx:latest
+    networks:
+      - janeway-net
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./dockervols/janeway/collected-static:/var/www/janeway/collected-static
+      - ./dockervols/janeway/media:/var/www/janeway/media
+    depends_on:
+      - start_nginx_dependencies
+
+networks:
+  janeway-net:

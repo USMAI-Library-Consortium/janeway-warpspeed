@@ -100,4 +100,4 @@ fi
 
 cd /vol/janeway/src
 mkdir -p /var/www/janeway/logs
-/opt/venv/bin/gunicorn --access-logfile - --error-logfile - --threads 1 --workers 2 --bind unix:/tmp/gunicorn.sock core.wsgi:application & nginx -g 'daemon off;'
+/opt/venv/bin/gunicorn --access-logfile - --error-logfile - --threads 1 --workers 2 --bind 0.0.0.0:$JANEWAY_PORT core.wsgi:application
