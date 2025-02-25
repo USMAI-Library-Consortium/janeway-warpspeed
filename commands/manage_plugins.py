@@ -90,33 +90,12 @@ class Command(BaseCommand):
 
             if convert_to_bool(install_plugin_env_name):
                 print(f"Built-in plugin {available_plugin_name} is requested to be installed via environment variable.")
-                
-                if os.path.exists(f"/var/www/janeway/additional-plugins/{available_plugin_name}"):
-                    print("You have manually placed this plugin 'additional_plugins', that version will be installed instead.")
-                    continue
 
                 action_taken = self.overwrite_plugin(available_plugin_name)
                 if action_taken == "install": 
                     installed_plugins.append(available_plugin_name)
                 if action_taken == "update":
                     updated_plugins.append(available_plugin_name)
-
-        # Transfer over custom plugins
-        for additional_plugin_name in os.listdir("/var/www/janeway/additional-plugins"):
-            existing_plugin = f"/vol/janeway/src/plugins/{additional_plugin_name}"
-            incoming_plugin = f"/var/www/janeway/additional-plugins/{additional_plugin_name}"
-            
-            if os.path.exists(existing_plugin):
-                incoming_is_newer = self.check_if_incoming_plugin_is_newer(existing_plugin, incoming_plugin, additional_plugin_name)
-                if not incoming_is_newer: return
-                
-                # Clear the existing plugin to be overwritten if the incoming plugin is newer than the existing one.
-                shutil.rmtree(existing_plugin)
-                updated_plugins.append(additional_plugin_name)
-            else:
-                installed_plugins.append(f"{additional_plugin_name} (from additional-plugins)")
-            
-            shutil.copytree(incoming_plugin, existing_plugin)
         
         os.system("python3 -m compileall -q /vol/janeway/src/plugins")
 

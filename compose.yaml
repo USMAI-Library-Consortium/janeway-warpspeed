@@ -72,7 +72,6 @@ services:
       - ./dockervols/janeway/collected-static:/var/www/janeway/collected-static
       - ./dockervols/janeway/media:/var/www/janeway/media
       - ./dockervols/janeway/logs:/var/www/janeway/logs
-      - ./dockervols/janeway/additional-plugins:/var/www/janeway/additional-plugins
       - ./dockervols/janeway/state-data:/var/www/janeway/state-data
       - ./dockervols/run:/run
       - ./dockervols/cron:/var/spool/cron/crontabs
@@ -101,8 +100,8 @@ services:
       - DJANGO_SUPERUSER_PASSWORD
       - JANEWAY_VERSION
       - INSTALL_CRON
-      - INSTALL_TYPESETTING_PLUGIN=False
-      - INSTALL_PANDOC_PLUGIN=False
+      - INSTALL_TYPESETTING_PLUGIN=True
+      - INSTALL_PANDOC_PLUGIN=True
       - INSTALL_CUSTOMSTYLING_PLUGIN=False
       - INSTALL_PORTICO_PLUGIN=False
       - INSTALL_IMPORTS_PLUGIN=False

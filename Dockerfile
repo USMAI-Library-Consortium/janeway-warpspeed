@@ -48,7 +48,7 @@ COPY ./janeway/src/ /vol/janeway/src/
 COPY prod_settings.py /vol/janeway/src/core/
 # Copy kubernetes install and setup script into Janeway
 RUN mkdir /vol/janeway/kubernetes
-COPY run-k8s.sh /vol/janeway/kubernetes/
+COPY autorun.sh /vol/janeway/docker/
 # Copy auto-install auto-update janeway install command into django commands
 COPY ./commands/ /vol/janeway/src/utils/management/commands/
 # Copy additional shared functions into the utils folder
@@ -83,10 +83,11 @@ RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp
 # Allow www-data to use cron
 RUN usermod -aG crontab janeway
 # Allow this file to be run
-RUN chmod +x /vol/janeway/kubernetes/run-k8s.sh
+RUN chmod +x /vol/janeway/docker/autorun.sh
 # Set the active user to the apache default
 USER janeway
 
 ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
 
-ENTRYPOINT ["/vol/janeway/kubernetes/run-k8s.sh"]
+WORKDIR /vol/janeway
+ENTRYPOINT ["/vol/janeway/docker/autorun.sh"]

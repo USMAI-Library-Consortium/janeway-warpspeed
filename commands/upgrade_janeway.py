@@ -27,7 +27,7 @@ class Command(BaseCommand):
         call_command("collectstatic", interactive=False)
         call_command("load_default_settings")
         os.system("python3 src/manage.py update_repository_settings")
-        call_command("manage_plugins_k8s")
+        call_command("manage_plugins")
         call_command("update_translation_fields")
         call_command("clear_cache")
 

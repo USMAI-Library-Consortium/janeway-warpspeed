@@ -50,7 +50,7 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
         fi
     done
     
-    python3 src/manage.py install_janeway_k8s 2>&1
+    python3 src/manage.py install_janeway_automatic 2>&1
     STATUS=$?
 
     if [[ $STATUS == "0" ]]; then
@@ -74,7 +74,7 @@ else
     if [[ "$INSTALLED_APPLICATION_VERSION" != "$INCOMING_APPLICATION_VERSION" ]]; then
         # Upgrade Janeway & plugins
         echo "Upgrading Janeway from $INSTALLED_APPLICATION_VERSION to $INCOMING_APPLICATION_VERSION..."
-        python3 src/manage.py upgrade_janeway_k8s 2>&1
+        python3 src/manage.py upgrade_janeway 2>&1
         STATUS=$?
         if [[ $STATUS == "0" ]]; then
             echo "Upgrade successful!"
@@ -88,7 +88,7 @@ else
 
         # Upgrade plugins
         echo "Running plugin update/install process..."
-        python3 src/manage.py manage_plugins_k8s 2>&1
+        python3 src/manage.py manage_plugins 2>&1
         python3 src/manage.py clear_cache 2>&1
 
         if [[ $INSTALL_CRON == "TRUE" ]]; then
