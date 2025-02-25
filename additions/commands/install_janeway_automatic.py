@@ -85,7 +85,7 @@ class Command(BaseCommand):
             call_command('createsuperuser', interactive=False, email=os.environ.get('DJANGO_SUPERUSER_EMAIL', "test@noreply.com"))
             os.system(f"echo {os.environ.get('JANEWAY_VERSION')} > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION")
 
-            call_command('manage_plugins_k8s')
+            call_command('manage_plugins')
 
             if convert_to_bool("INSTALL_CRON"):
                 print("True")

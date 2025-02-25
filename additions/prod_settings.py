@@ -5,6 +5,7 @@ from .janeway_global_settings import LOGGING # type: ignore
 # Set the static and media directories 
 STATIC_ROOT = "/var/www/janeway/collected-static"
 MEDIA_ROOT = "/var/www/janeway/media"
+STATE_DATA_DIR = "/var/www/janeway/state-data"
 
 # Enable ORCID to be configured by Kubernetes
 ENABLE_ORCID = convert_to_bool('JANEWAY_ENABLE_ORCID')

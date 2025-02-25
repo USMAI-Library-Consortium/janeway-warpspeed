@@ -31,12 +31,12 @@ RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=23.0.0,<24.0.0'
 ENV PYTHONDONTWRITEBYTECODE=1
 
 # Copy all installable plugins into a temp directory, to be collected and installed later
-WORKDIR /vol/janeway/src/available-plugins
+WORKDIR /vol/janeway/src/plugins
 RUN git clone https://github.com/openlibhums/pandoc_plugin.git --branch v1.0.0-RC-1
 RUN git clone https://github.com/openlibhums/typesetting.git --branch v1.7.0-RC-2
 RUN git clone https://github.com/openlibhums/back_content.git --branch v1.6.0-RC-1
 RUN git clone https://github.com/openlibhums/customstyling.git --branch v1.1.1
-RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master && pip3 install marshmallow
+RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master
 RUN git clone https://github.com/openlibhums/imports.git --branch v1.10
 RUN git clone https://github.com/openlibhums/portico.git --branch master
 RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
@@ -45,14 +45,15 @@ RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
 # Copy Janeway code
 COPY ./janeway/src/ /vol/janeway/src/
 # Copy custom settings file into Janeway
-COPY prod_settings.py /vol/janeway/src/core/
+COPY ./additions/prod_settings.py /vol/janeway/src/core/
 # Copy kubernetes install and setup script into Janeway
-RUN mkdir /vol/janeway/kubernetes
-COPY run-k8s.sh /vol/janeway/kubernetes/
+RUN mkdir /vol/janeway/docker
+COPY ./additions/autorun.sh /vol/janeway/docker/
 # Copy auto-install auto-update janeway install command into django commands
-COPY ./commands/ /vol/janeway/src/utils/management/commands/
+COPY ./additions/commands/ /vol/janeway/src/utils/management/commands/
 # Copy additional shared functions into the utils folder
-COPY k8s_shared.py /vol/janeway/src/utils/
+COPY ./additions/k8s_shared.py /vol/janeway/src/utils/
+COPY ./additions/plugin_version_manager.py /vol/janeway/src/core
 # Create Janeway logs directory
 RUN mkdir -p /vol/janeway/logs
 RUN touch /vol/janeway/logs/janeway.log
@@ -83,10 +84,10 @@ RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp
 # Allow www-data to use cron
 RUN usermod -aG crontab janeway
 # Allow this file to be run
-RUN chmod +x /vol/janeway/kubernetes/run-k8s.sh
+RUN chmod +x /vol/janeway/docker/autorun.sh
 # Set the active user to the apache default
 USER janeway
 
 ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
 
-ENTRYPOINT ["/vol/janeway/kubernetes/run-k8s.sh"]
+ENTRYPOINT ["/vol/janeway/docker/autorun.sh"]
