@@ -1,5 +1,4 @@
 import os
-from utils.k8s_shared import convert_to_bool # type: ignore
 from .janeway_global_settings import LOGGING # type: ignore
 
 # Set the static and media directories 
@@ -7,18 +6,38 @@ STATIC_ROOT = "/var/www/janeway/collected-static"
 MEDIA_ROOT = "/var/www/janeway/media"
 
 # Enable ORCID to be configured by Kubernetes
-ENABLE_ORCID = convert_to_bool('JANEWAY_ENABLE_ORCID')
-EMAIL_USE_TLS = convert_to_bool('JANEWAY_EMAIL_USE_TLS')
+ENABLE_ORCID = os.getenv("JANEWAY_ENABLE_ORCID", "False").lower() in ("true", "1", "yes")
+EMAIL_USE_TLS = os.getenv("JANEWAY_EMAIL_USE_TLS", "False").lower() in ("true", "1", "yes")
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'janeway',
     os.environ.get('JANEWAY_PRESS_DOMAIN')
 ]
 
-journal_domain = os.environ.get('JANEWAY_JOURNAL_DOMAIN', False)
-if journal_domain:
-    ALLOWED_HOSTS.append(journal_domain)
+if DEBUG:
+    ALLOWED_HOSTS.append("127.0.0.1")
+    ALLOWED_HOSTS.append("localhost")
+    ALLOWED_HOSTS.append("janeway")
+
+journal_domains = os.getenv("JANEWAY_JOURNAL_DOMAINS", "").split(",")
+if journal_domains:
+    for domain in journal_domains:
+        ALLOWED_HOSTS.append(journal_domains)
+
+CSRF_TRUSTED_ORIGINS=[
+    os.environ.get('JANEWAY_PRESS_DOMAIN_SCHEME') + os.environ.get('JANEWAY_PRESS_DOMAIN')
+]
+
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS.append("http://127.0.0.1")
+    CSRF_TRUSTED_ORIGINS.append("http://localhost")
+    CSRF_TRUSTED_ORIGINS.append("http://janeway")
+
+journal_domains = os.getenv("JANEWAY_JOURNAL_DOMAINS", "").split(",")
+journal_domain_schemes = os.getenv("JANEWAY_JOURNAL_DOMAIN_SCHEMES", "").split(",")
+if journal_domains:
+    for i, domain in enumerate(journal_domains):
+        if domain:
+            CSRF_TRUSTED_ORIGINS.append(journal_domain_schemes[i] + journal_domains[i])
 
 LOGGING['handlers']['log_file']['filename'] = "/var/www/janeway/logs/janeway.log"

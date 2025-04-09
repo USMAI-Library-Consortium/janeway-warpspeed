@@ -48,16 +48,17 @@ services:
       - janeway-net
     depends_on:
      - "janeway-postgres"
-     - janeway-debug-smtp
+     - "janeway-debug-smtp"
+     - "copy-janeway-static"
     command: "janeway-postgres:${DB_PORT}"
 
-  start_nginx_dependencies:
-    image: dadarek/wait-for-dependencies
-    networks:
-      - janeway-net
-    depends_on:
-     - "janeway-web"
-    command: "janeway-web:${JANEWAY_PORT}"
+  copy-janeway-static:
+    build:
+      context: .
+      dockerfile: compose/copystatic.dockerfile
+    volumes:
+      - ./dockervols/static:/vol/janeway/src/staticDynamic
+      - ./dockervols/xsl:/vol/janeway/src/transform/xslDynamic
 
   janeway-web:
     build:
@@ -75,6 +76,7 @@ services:
       - ./dockervols/janeway/state-data:/var/www/janeway/state-data
       - ./dockervols/run:/run
       - ./dockervols/cron:/var/spool/cron/crontabs
+      - tmp:/tmp # Used for Nginx socket and Janeway install
     environment:
       - DB_VENDOR
       - DB_HOST
@@ -92,6 +94,9 @@ services:
       - JANEWAY_ENABLE_ORCID
       - JANEWAY_PRESS_NAME
       - JANEWAY_PRESS_DOMAIN
+      - JANEWAY_PRESS_DOMAIN_SCHEME
+      - JANEWAY_JOURNAL_DOMAINS
+      - JANEWAY_JOURNAL_DOMAIN_SCHEMES
       - JANEWAY_PRESS_CONTACT
       - JANEWAY_JOURNAL_CODE
       - JANEWAY_JOURNAL_NAME
@@ -108,6 +113,7 @@ services:
       - INSTALL_DOAJ_TRANSPORTER_PLUGIN=False
       - INSTALL_BACK_CONTENT_PLUGIN=False
       - INSTALL_REPORTING_PLUGIN=False
+      - DJANGO_DEBUG=True
     depends_on:
       - "start_janeway_dependencies"
 
@@ -115,14 +121,22 @@ services:
     ports:
       - "${JANEWAY_PORT}:${JANEWAY_PORT}"
     image: nginx:latest
+    environment:
+      - JANEWAY_PORT
     networks:
       - janeway-net
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./compose/nginx.conf:/etc/nginx/nginx.conf
+      - ./compose/wait-for-janeway.sh:/scripts/wait-for-janeway.sh
       - ./dockervols/janeway/collected-static:/var/www/janeway/collected-static
       - ./dockervols/janeway/media:/var/www/janeway/media
-    depends_on:
-      - start_nginx_dependencies
+      - tmp:/tmp # Used for Nginx socket and Janeway install
+      - ./dockervols/static:/vol/janeway/src/static
+      - ./dockervols/xsl:/vol/janeway/src/transform/xsl
+    command: bash -c "chmod +x /scripts/wait-for-janeway.sh && /scripts/wait-for-janeway.sh"
 
 networks:
   janeway-net:
+
+volumes:
+  tmp:

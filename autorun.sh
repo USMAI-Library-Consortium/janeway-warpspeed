@@ -101,4 +101,4 @@ else
 fi
 
 cd /vol/janeway/src
-/opt/venv/bin/gunicorn --access-logfile - --error-logfile - --threads 1 --workers 2 --bind 0.0.0.0:$JANEWAY_PORT core.wsgi:application
+/opt/venv/bin/gunicorn --access-logfile - --error-logfile - --threads 1 --workers 2 --bind unix:/tmp/janeway.sock core.wsgi:application

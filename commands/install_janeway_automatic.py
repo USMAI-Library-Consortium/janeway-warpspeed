@@ -73,7 +73,7 @@ class Command(BaseCommand):
             call_command('load_default_settings')
             call_command('loaddata', roles_path)
             journal.name = os.getenv("JANEWAY_JOURNAL_NAME", default='Test Journal')
-            journal.description = os.getenv("JANEWAY_JOURNAL_DOMAIN", default='')
+            journal.description = os.getenv("JANEWAY_JOURNAL_DESCRIPTION", default='')
             journal.save()
             journal.setup_directory()
 

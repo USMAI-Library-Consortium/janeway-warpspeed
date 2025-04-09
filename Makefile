@@ -50,6 +50,7 @@ export JANEWAY_ENABLE_ORCID
 # Install variables
 export JANEWAY_PRESS_NAME=Test Press
 export JANEWAY_PRESS_DOMAIN=localhost:${JANEWAY_PORT}
+export JANEWAY_PRESS_DOMAIN_SCHEME=http://
 export JANEWAY_PRESS_CONTACT=test@example.com
 export JANEWAY_JOURNAL_CODE=test_journal
 export JANEWAY_JOURNAL_NAME=New Test Journal

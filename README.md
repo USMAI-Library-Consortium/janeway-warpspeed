@@ -22,9 +22,9 @@ All setup and configuration options are set with environment variables. Please n
 There are many environment variables needed to make this application run properly. They're divided into five categories:
 1. Environment variables always required
 2. Environment variables only required when installing Janeway for the first time
-3. Optional environment variables
+3. Optional (including conditionally required) environment variables
 4. Conditionally required environment variables
-5. Additional environment variables required if using this docker image outside of docker-compose or official Helm Chart
+5. Additional environment variables required if using this docker image outside of the provided docker-compose or the official Helm Chart
 
 ### Required environment variables:
 1. DB_HOST: Hostname of your Postgres DB
@@ -33,6 +33,7 @@ There are many environment variables needed to make this application run properl
 4. DB_USER: Name of the postgres user
 5. DB_PASSWORD: Password to connect to the postgres DB
 6. JANEWAY_PRESS_DOMAIN: Specifies the Press Domain to use when installing Janeway AND for nginx routing. MUST be the same as the domain name that you give Janeway on your Kubernetes cluster
+7. JANEWAY_PRESS_DOMAIN_SCHEME: The scheme for the Janeway domain, e.g. https://, used for CSRF protection
 
 ### Environment variables required ONLY when installing Janeway
 1. JANEWAY_PRESS_NAME: Specifies the Press Name to use when installing Janeway
@@ -45,7 +46,7 @@ There are many environment variables needed to make this application run properl
 
 ### Optional environment variables
 1. JANEWAY_JOURNAL_DESCRIPTION: Only used during Janeway install.
-2. JANEWAY_JOURNAL_DOMAIN: If the Janeway 1st journal has a seperate domain, what the domain should be. Only used during Janeway install.
+2. JANEWAY_JOURNAL_DOMAIN: Used only during install, this command will specify the domain for the default journal. It MUST also be included
 3. INSTALL_TYPESETTING_PLUGIN: Install the typesetting plugin - TRUE or FALSE, FALSE if not set
 4. INSTALL_PANDOC_PLUGIN: Install the pandoc plugin - TRUE or FALSE, FALSE if not set
 5. INSTALL_CUSTOMSTYLING_PLUGIN: Install the custom styling plugin - TRUE or FALSE, FALSE if not set
@@ -53,7 +54,12 @@ There are many environment variables needed to make this application run properl
 7. INSTALL_IMPORTS_PLUGIN: Install the imports plugin - TRUE or FALSE, FALSE if not set
 8. INSTALL_DOAJ_TRANSPORTER_PLUGIN: Install the doaj_transporter plugin - TRUE or FALSE, FALSE if not set
 9. INSTALL_BACK_CONTENT_PLUGIN: Install the back_content plugin - TRUE or FALSE, FALSE if not set
-9. INSTALL_REPORTING_PLUGIN: Install the reporting plugin - TRUE or FALSE, FALSE if not set
+10. INSTALL_REPORTING_PLUGIN: Install the reporting plugin - TRUE or FALSE, FALSE if not set
+11. DJANGO_DEBUG: Whether to run Django in debug mode.
+
+### Conditionally required environment variables
+1. JANEWAY_JOURNAL_DOMAINS: If Janeway has domains for journals, this is required. Comma separated array (no spaces after commas)
+2. JANEWAY_JOURNAL_DOMAIN_SCHEMES: If Janeway has domains for journals, this is required. Schemes are, for example, https://. Comma separated array (no spaces after commas). Each scheme must match a domain in JANEWAY_JOURNAL_DOMAINS by index. 
 
 ### Environment variables REQUIRED but Auto-Set 
 You must set these if you're using this docker image outside of the Helm Chart or outside of the built-in Compose.
