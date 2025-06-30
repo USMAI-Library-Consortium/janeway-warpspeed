@@ -22,7 +22,7 @@ if DEBUG:
 journal_domains = os.getenv("JANEWAY_JOURNAL_DOMAINS", "").split(",")
 if journal_domains:
     for domain in journal_domains:
-        ALLOWED_HOSTS.append(journal_domains)
+        ALLOWED_HOSTS.append(domain)
 
 CSRF_TRUSTED_ORIGINS=[
     os.environ.get('JANEWAY_PRESS_DOMAIN_SCHEME') + os.environ.get('JANEWAY_PRESS_DOMAIN')

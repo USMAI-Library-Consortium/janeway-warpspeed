@@ -51,6 +51,7 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
     done
     
     python3 src/manage.py install_janeway_automatic 2>&1
+    python3 src/manage.py migrate 2>&1
     STATUS=$?
 
     if [[ $STATUS == "0" ]]; then
@@ -75,6 +76,7 @@ else
         # Upgrade Janeway & plugins
         echo "Upgrading Janeway from $INSTALLED_APPLICATION_VERSION to $INCOMING_APPLICATION_VERSION..."
         python3 src/manage.py upgrade_janeway 2>&1
+        python3 src/manage.py migrate 2>&1
         STATUS=$?
         if [[ $STATUS == "0" ]]; then
             echo "Upgrade successful!"
