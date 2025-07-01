@@ -17,14 +17,18 @@ Additional changes were made to optimize the Docker image for Kubernetes, such a
 
 All setup and configuration options are set with environment variables. Please note the required environment variables. Also please note that this Docker image is only compatible with Postgres.
 
+## Docker-Compose
+
+The docker-compose I've provided is **NOT PRODUCTION READY** - it's intended to test the image is working properly. Feel free to base your own docker-compose off of this one - and I'm sure the community would love if you put in a pull request for whatever improvements you make!
+
 ## Environment Variables
 
 There are many environment variables needed to make this application run properly. They're divided into five categories:
 1. Environment variables always required
 2. Environment variables only required when installing Janeway for the first time
-3. Optional (including conditionally required) environment variables
+3. Optional environment variables
 4. Conditionally required environment variables
-5. Additional environment variables required if using this docker image outside of the provided docker-compose or the official Helm Chart
+5. Additional environment variables required if you're using this docker image outside of the provided docker-compose or the official Helm Chart (which is TBA)
 
 ### Required environment variables:
 1. DB_HOST: Hostname of your Postgres DB
@@ -46,7 +50,7 @@ There are many environment variables needed to make this application run properl
 
 ### Optional environment variables
 1. JANEWAY_JOURNAL_DESCRIPTION: Only used during Janeway install.
-2. JANEWAY_JOURNAL_DOMAIN: Used only during install, this command will specify the domain for the default journal. It MUST also be included
+2. JANEWAY_JOURNAL_DOMAIN: Used only during install, this command will specify the domain for the default journal.
 3. INSTALL_TYPESETTING_PLUGIN: Install the typesetting plugin - TRUE or FALSE, FALSE if not set
 4. INSTALL_PANDOC_PLUGIN: Install the pandoc plugin - TRUE or FALSE, FALSE if not set
 5. INSTALL_CUSTOMSTYLING_PLUGIN: Install the custom styling plugin - TRUE or FALSE, FALSE if not set
