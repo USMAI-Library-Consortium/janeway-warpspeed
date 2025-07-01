@@ -40,6 +40,7 @@ RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch maste
 RUN git clone https://github.com/openlibhums/imports.git --branch v1.10
 RUN git clone https://github.com/openlibhums/portico.git --branch master
 RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
+RUN git clone https://github.com/openlibhums/datacite.git --branch v0.4.0
 
 # Add the rest of the source code
 # Copy Janeway code

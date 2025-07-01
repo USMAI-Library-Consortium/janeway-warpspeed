@@ -59,7 +59,8 @@ There are many environment variables needed to make this application run properl
 8. INSTALL_DOAJ_TRANSPORTER_PLUGIN: Install the doaj_transporter plugin - TRUE or FALSE, FALSE if not set
 9. INSTALL_BACK_CONTENT_PLUGIN: Install the back_content plugin - TRUE or FALSE, FALSE if not set
 10. INSTALL_REPORTING_PLUGIN: Install the reporting plugin - TRUE or FALSE, FALSE if not set
-11. DJANGO_DEBUG: Whether to run Django in debug mode.
+11. INSTALL_DATACITE_PLUGIN: Install the DataCite plugin - TRUE or FALSE, FALSE if not set
+12. DJANGO_DEBUG: Whether to run Django in debug mode.
 
 ### Conditionally required environment variables
 1. JANEWAY_JOURNAL_DOMAINS: If Janeway has domains for journals, this is required. Comma separated array (no spaces after commas)
