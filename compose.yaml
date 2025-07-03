@@ -70,15 +70,11 @@ services:
       - ./dockervols/files:/vol/janeway/src/files
       - ./dockervols/plugins:/vol/janeway/src/plugins
       - ./dockervols/lib:/vol/janeway/lib
-      - ./dockervols/janeway/collected-static:/var/www/janeway/collected-static
-      - ./dockervols/janeway/media:/var/www/janeway/media
-      - ./dockervols/janeway/logs:/var/www/janeway/logs
-      - ./dockervols/janeway/state-data:/var/www/janeway/state-data
+      - ./dockervols/janeway:/var/www/janeway/
       - ./dockervols/run:/run
       - ./dockervols/cron:/var/spool/cron/crontabs
       - tmp:/tmp # Used for Nginx socket and Janeway install
     environment:
-      - DB_VENDOR
       - DB_HOST
       - DB_PORT
       - DB_PASSWORD
@@ -103,7 +99,6 @@ services:
       - DJANGO_SUPERUSER_USERNAME
       - DJANGO_SUPERUSER_EMAIL
       - DJANGO_SUPERUSER_PASSWORD
-      - JANEWAY_VERSION
       - INSTALL_CRON
       - INSTALL_TYPESETTING_PLUGIN=True
       - INSTALL_PANDOC_PLUGIN=True
@@ -128,8 +123,7 @@ services:
     volumes:
       - ./compose/nginx.conf:/etc/nginx/nginx.conf
       - ./compose/wait-for-janeway.sh:/scripts/wait-for-janeway.sh
-      - ./dockervols/janeway/collected-static:/var/www/janeway/collected-static
-      - ./dockervols/janeway/media:/var/www/janeway/media
+      - ./dockervols/janeway:/var/www/janeway/
       - tmp:/tmp # Used for Nginx socket and Janeway install
       - ./dockervols/static:/vol/janeway/src/static
       - ./dockervols/xsl:/vol/janeway/src/transform/xsl

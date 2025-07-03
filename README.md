@@ -28,7 +28,6 @@ There are many environment variables needed to make this application run properl
 2. Environment variables only required when installing Janeway for the first time
 3. Optional environment variables
 4. Conditionally required environment variables
-5. Additional environment variables required if you're using this docker image outside of the provided docker-compose or the official Helm Chart (which is TBA)
 
 ### Required environment variables:
 1. DB_HOST: Hostname of your Postgres DB
@@ -64,10 +63,4 @@ There are many environment variables needed to make this application run properl
 
 ### Conditionally required environment variables
 1. JANEWAY_JOURNAL_DOMAINS: If Janeway has domains for journals, this is required. Comma separated array (no spaces after commas)
-2. JANEWAY_JOURNAL_DOMAIN_SCHEMES: If Janeway has domains for journals, this is required. Schemes are, for example, https://. Comma separated array (no spaces after commas). Each scheme must match a domain in JANEWAY_JOURNAL_DOMAINS by index. 
-
-### Environment variables REQUIRED but Auto-Set 
-You must set these if you're using this docker image outside of the Helm Chart or outside of the built-in Compose.
-1. JANEWAY_VERSION - The version of Janeway this docker image is using
-2. DEPLOYMENT_VERSION - the deployment version this docker image is using. Incrementing the deployment version will trigger the update process
-3. DB_VENDOR - MUST be set to serve postgres
+2. JANEWAY_JOURNAL_DOMAIN_SCHEMES: If Janeway has domains for journals, this is required. Schemes are, for example, https://. Comma separated array (no spaces after commas). Each scheme must match a domain in JANEWAY_JOURNAL_DOMAINS by index.

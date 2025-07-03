@@ -15,6 +15,8 @@ ENV VENV_PATH=/opt/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV STATIC_DIR=/var/www/janeway/collected-static
 ENV MEDIA_DIR=/var/www/janeway/media
+ENV JANEWAY_VERSION="1.7.5"
+ENV DB_VENDOR="postgres"
 
 # Create the virtual environment
 RUN python3 -m venv $VENV_PATH

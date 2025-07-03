@@ -30,6 +30,11 @@ else
     exit 1
 fi
 
+# Set up persisted folders
+for var in state-data logs collected_static media; do
+    mkdir -p /var/www/janeway/${var}
+done
+
 cd /vol/janeway
 source "$VENV_PATH/bin/activate"
 

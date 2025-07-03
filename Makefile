@@ -31,7 +31,6 @@ ifdef DEBUG_SMTP
 	JANEWAY_EMAIL_USE_TLS=
 endif
 
-export DB_VENDOR=postgres
 export DB_HOST
 export DB_PORT
 export DB_NAME
@@ -54,9 +53,6 @@ export JANEWAY_PRESS_DOMAIN_SCHEME=http://
 export JANEWAY_PRESS_CONTACT=test@example.com
 export JANEWAY_JOURNAL_CODE=test_journal
 export JANEWAY_JOURNAL_NAME=New Test Journal
-
-# Variables for Janeway state (controls auto-install and auto-update)
-export JANEWAY_VERSION=1.7.5
 
 export DJANGO_SUPERUSER_EMAIL=test@example.com
 export DJANGO_SUPERUSER_USERNAME=johndoe
