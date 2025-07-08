@@ -55,7 +55,8 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
         fi
     done
     
-    python3 src/manage.py install_janeway_automatic 2>&1
+    python3 src/manage.py install_janeway --use-defaults 2>&1
+    python3 src/manage.py createsuperuser --no-input --email="$DJANGO_SUPERUSER_EMAIL" 2>&1
     python3 src/manage.py migrate 2>&1
     STATUS=$?
 
