@@ -31,7 +31,7 @@ else
 fi
 
 # Set up persisted folders
-for var in state-data logs collected_static media; do
+for var in state-data logs collected-static media; do
     mkdir -p /var/www/janeway/${var}
 done
 
