@@ -60,6 +60,9 @@ There are many environment variables needed to make this application run properl
 10. INSTALL_REPORTING_PLUGIN: Install the reporting plugin - TRUE or FALSE, FALSE if not set
 11. INSTALL_DATACITE_PLUGIN: Install the DataCite plugin - TRUE or FALSE, FALSE if not set
 12. DJANGO_DEBUG: Whether to run Django in debug mode.
+13. PYTHON_ENABLE_GUNICORN_MULTIWORKERS: Enable Gunicorn multi worker multi thread config. 'true' or 'false', default true.
+14. PYTHON_GUNICORN_CUSTOM_WORKER_NUM: Set the number of Gunicorn workers. Only works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'. Default (2 * CPU Core number) + 1
+15. PYTHON_GUNICORN_CUSTOM_THREAD_NUM: Set the number of Gunicorn worker threads. Only works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'. Default 1.
 
 ### Conditionally required environment variables
 1. JANEWAY_JOURNAL_DOMAINS: If Janeway has domains for journals, this is required. Comma separated array (no spaces after commas)
