@@ -97,6 +97,7 @@ else
         # Upgrade plugins
         echo "Running plugin update/install process..."
         python3 src/manage.py manage_plugins 2>&1
+        python3 src/manage.py migrate 2>&1
         python3 src/manage.py clear_cache 2>&1
 
         if [[ $INSTALL_CRON == "TRUE" ]]; then
