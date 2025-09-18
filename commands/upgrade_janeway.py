@@ -24,7 +24,6 @@ class Command(BaseCommand):
         print("Starting updater...")
         call_command("migrate")
         call_command("build_assets")
-        call_command("collectstatic", interactive=False)
         call_command("load_default_settings")
         os.system("python3 src/manage.py update_repository_settings")
         call_command("manage_plugins")

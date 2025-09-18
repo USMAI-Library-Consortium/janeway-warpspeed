@@ -10,6 +10,9 @@ ENABLE_ORCID = os.getenv("JANEWAY_ENABLE_ORCID", "False").lower() in ("true", "1
 EMAIL_USE_TLS = os.getenv("JANEWAY_EMAIL_USE_TLS", "False").lower() in ("true", "1", "yes")
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
+if os.getenv("INSTALLATION_BASE_THEME"):
+    INSTALLATION_BASE_THEME = os.getenv("INSTALLATION_BASE_THEME")
+
 ALLOWED_HOSTS = [
     os.environ.get('JANEWAY_PRESS_DOMAIN')
 ]

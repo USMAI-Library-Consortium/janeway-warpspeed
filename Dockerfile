@@ -15,7 +15,7 @@ ENV VENV_PATH=/opt/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV STATIC_DIR=/var/www/janeway/collected-static
 ENV MEDIA_DIR=/var/www/janeway/media
-ENV JANEWAY_VERSION="1.7.5"
+ENV JANEWAY_VERSION="1.8.2"
 ENV DB_VENDOR="postgres"
 ENV PYTHON_ENABLE_GUNICORN_MULTIWORKERS='true'
 
@@ -36,7 +36,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Copy all installable plugins into a temp directory, to be collected and installed later
 WORKDIR /vol/janeway/src/available-plugins
 RUN git clone https://github.com/openlibhums/pandoc_plugin.git --branch v1.0.0-RC-1
-RUN git clone https://github.com/openlibhums/typesetting.git --branch v1.7.0-RC-2
 RUN git clone https://github.com/openlibhums/back_content.git --branch v1.6.0-RC-1
 RUN git clone https://github.com/openlibhums/customstyling.git --branch v1.1.1
 RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master && pip3 install marshmallow
@@ -58,10 +57,12 @@ COPY initialize-janeway.sh /vol/janeway/docker/
 COPY ./commands/ /vol/janeway/src/utils/management/commands/
 # Copy additional shared functions into the utils folder
 COPY k8s_shared.py /vol/janeway/src/utils/
+# Copy custom themes into the themes folder & remove the gitignore
+COPY ./custom-themes/ /vol/janeway/src/themes/
+RUN rm -f /vol/janeway/src/themes/.gitignore
 # Create Janeway logs directory
 RUN mkdir -p /vol/janeway/logs
-RUN touch /vol/janeway/logs/janeway.log
-# Required in Docker-Compose, will be overwritten on Kubernetes
+RUN touch /vol/janeway/logs/janeway.logs
 
 # Generate python bytecode files - they cannot be generated on the k8s because
 # Read-Only-Filesystems is enabled.
