@@ -1,0 +1,22 @@
+
+{% extends "core/base.html" %}
+{% load truncate %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Home" %}{% endblock page_title %}
+{% block title %}{{ press.name }}{% endblock title %}
+{% block navbarbrand %}{{ press.name }}{% endblock navbarbrand %}
+
+{% block page_hero_title %}RESEARCH, FREE FOR ALL{% endblock %}
+
+{% block body %}
+    <form action="{% url 'press_journals' %}" method="get" class="search-form">
+        <input aria-label="Search Journals" type="search" placeholder="Search Journals" name="filter">
+        <button type="submit" class="search-button search-button--home">Search</button>
+    </form>
+
+    {% for element in homepage_elements %}
+        {% include element.template_path %}
+    {% endfor %}
+
+{% endblock body %}

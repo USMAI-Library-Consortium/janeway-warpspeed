@@ -1,0 +1,7 @@
+@mixin base-button {
+  font-family: SANS-SERIF;
+  text-transform: uppercase;
+  font-weight: 700;
+  background-color: var(--primary);
+  color: var(--button-text-color);
+}

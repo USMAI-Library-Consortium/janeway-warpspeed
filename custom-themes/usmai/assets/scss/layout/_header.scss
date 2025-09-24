@@ -1,0 +1,155 @@
+/* Remove Top Bar Borders */
+.top-bar-right.border-left {
+  border: none;
+}
+.top-bar-left.border-right {
+  border: none;
+}
+
+/* Fix top bar element spacing (don't want the things to go all the way to the side) */
+.main.top-bar {
+  max-width: 1200px;
+  border: none;
+  margin: 0 auto;
+}
+
+.main.top-bar.top-bar__journal {
+  max-width: none;
+  border: none;
+  margin: 0 auto;
+}
+
+.top-bar-image.header-image__journal {
+  padding: 0;
+  padding-left: 1.25rem;
+  margin: 1rem 0;
+  border-left: 1px solid #acacac;
+  max-height: 75px;
+}
+
+header .top-bar {
+    border-bottom: none;
+}
+
+/* Set the border color of the top & bottom of the nav bar */
+.menu.vertical.medium-horizontal.dropdown {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Align the press logo properly */
+.top-bar-left.header-image-bar {
+  display: flex;
+  align-items: center;
+}
+.top-bar-left.header-image-bar a {
+  display: block;
+}
+@media screen and (min-width: 40em) {
+  header .top-bar-image {
+    margin-top: 0; /* Override the negative margin */
+  }
+}
+/**/
+
+header #main-menu li a {
+  font-family: "Interstate", Helvetica, Arial, Verdana, sans-serif;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Fix user dropdown not being centered vertically */
+.top-bar-right.border-left {
+  display: flex;
+  align-items: center;
+}
+
+/* Hero Styling */
+.hero {
+  position: relative; /* allows absolute positioning inside */
+  display: inline-block; /* shrink to fit the image */
+  width: 100%;
+
+  &__image {
+    width: 100%;
+    max-height: 20rem;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+
+  &__title {
+    position: absolute;
+    top: 15%; /* vertical position */
+    left: 45%; /* horizontal position */
+    font-family: "Barlow Condensed", Arial Narrow, sans-serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 6rem;
+    text-transform: uppercase;
+  }
+
+  &__slogan-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+
+    p > {
+      font-family: "Barlow Condensed", Arial Narrow, sans-serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 4rem;
+    }
+  }
+}
+
+@media screen and (max-width: 1450px) {
+  .hero__title {
+    font-size: 4.5rem;
+  }
+}
+
+@media screen and (max-width: 1075px) {
+  .hero__title {
+    font-size: 3.75rem;
+  }
+}
+/**/
+
+/* header stripe (the red UMD header above the main header) */
+.header-stripe {
+  background-color: var(--primary);
+  height: 3rem;
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+  }
+
+  &__logo {
+    color: white;
+    font-family: Crimson Text, Georgia, serif !important;
+  }
+
+  /* This is the 'Make a Gift' section */
+  &__link {
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    fill: white;
+    height: 100%;
+    padding: 0 0.75rem;
+    text-transform: uppercase;
+    font-size: 1rem;
+
+    &:hover {
+      color: white;
+      background-color: #911c16;
+    }
+  }
+}

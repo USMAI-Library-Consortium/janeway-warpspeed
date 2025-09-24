@@ -1,0 +1,44 @@
+.content > h3 > a:hover {
+  text-decoration: underline;
+}
+
+.main-footer {
+  &__top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    background-color: lightgrey;
+    align-items: center;
+    padding: 1.5rem 0;
+  }
+
+  &__press-logo-container {
+    display: block;
+    width: 15vw;
+  }
+
+  &__janeway-logo {
+    display: block;
+    width: 10vw;
+    margin-left: 4vw;
+
+    > svg {
+      > path {
+        fill: black;
+      }
+    }
+  }
+
+  &__message {
+    width: max-content;
+    & p {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+footer svg,
+footer img {
+  max-width: none;
+  max-height: none;
+}

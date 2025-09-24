@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% load truncate %}
+{% load i18n %}
+{% load next_url %}
+
+{% block title %}{% trans "Become a Reviewer" %}{% endblock title %}
+{% block page_hero_title %}{% trans "Become a Reviewer" %}{% endblock %}
+
+{% block body %}
+    <section id="content" class="no-padding">
+        <div class="row column">
+            <p>{{ message }}</p>
+
+            {% if not code == 'already-reviewer' %}
+                {% if code == 'not-logged-in' %}
+                    <a class="success button" href="{% url_with_return 'core_login' %}">
+                      {% trans "Log in" %}
+                    </a>
+                {% else %}
+                    <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="go" class="success button" >{% trans "Become a Reviewer" %}</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+{% endblock body %}

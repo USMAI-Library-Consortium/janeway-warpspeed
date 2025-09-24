@@ -1,0 +1,22 @@
+<section aria-labelledby="latest-issue-title">
+    <div class="row column">
+        <h2 id="latest-issue-title" class="title">{% trans "Latest Issue" %}</h2>
+    </div>
+    <div class="issue-block">
+        <img class="issue-block__image" src="{{ issue.cover_image.url }}" alt='{{ issue.display_title_a11y }}'>
+        <div class="issue-block__text">
+            <h3 class="em issue-block__title" aria-label='{{ issue.display_title_a11y }}'>{{ issue.display_title }}</h3>
+            <div class="issue-block__body">
+                {% if issue.issue_description %}<p class="issue-block__description">{{ issue.issue_description|safe }}</p>{% endif %}
+                {% if issue.journal.display_issue_doi and issue.doi_url %}
+                <p class="issue-block__doi"><b>DOI: </b><a href="{{ issue.doi_url }}">{{ issue.doi_url }}</a></p>
+                {% endif %}
+                {% if issue.editors.all %}
+                <h3>Editors: </h3>
+                <p>{% for editor in issue.issueeditor_set.all %}{{ editor.account.full_name }} ({{ editor.role }}){% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                {% endif %}
+            </div>
+            <a class="button" href="{{issue.url}}">View Issue</a>
+        </div> 
+    </div>
+</section>

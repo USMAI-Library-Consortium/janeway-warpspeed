@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+
+{% load truncate %}
+
+
+{% block page_title %}Journal Home{% endblock %}
+
+{% block css %}{% endblock %}
+
+{% block page_hero_title %}{{ request.journal.name }}{% endblock page_hero_title %}
+
+{% block body %}
+    {% for element in homepage_elements %}
+    <div class="homepage-element-wrapper homepage-element-{{ element.name|slugify }}">
+        {% include element.template_path %}
+    </div>
+    {% endfor %}
+
+{% endblock body %}
+
+{% block js %}
+{% endblock js %}

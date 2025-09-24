@@ -1,0 +1,42 @@
+/* Set minimum main height */
+main {
+  min-height: 85vh;
+}
+
+/* Add back anchor hover underline */
+.content a:hover {
+  text-decoration: underline;
+}
+
+/* Set body fonts */
+body {
+  font-family: var(--body-font);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+label {
+  font-family: var(--body-font);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #454545;
+}
+
+h2, h3, h4 {
+  font-family: var(--header-font);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: var(--title-font);
+  font-weight: var(--title-font-weight);
+}
+
+.pagination a, .pagination button {
+  color: white;
+}
+
+.pagination a:hover, .pagination button:hover {
+  color: black;
+}

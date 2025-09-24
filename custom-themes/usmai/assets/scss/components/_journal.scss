@@ -1,0 +1,51 @@
+/* HOMEPAGE JOURNAL ELEMENT */
+.box.journal-list {
+  border: 1px solid black;
+  transition: all 0.3s ease;
+}
+
+.box.journal-list:hover {
+  transform: translate(0, -7px);
+}
+
+.box.journal-list > .content {
+  padding: 0 0.25rem;
+  padding-top: 0.4rem;
+  padding-bottom: 0.35rem;
+  text-align: center;
+}
+
+/* Set the color of the journal name */
+.content > h3 > a {
+  color: #454545;
+}
+/* */
+
+/* JOURNALS PAGE JOURNAL ELEMENT */
+.expanded.button-group > a.button {
+  @include base-button;
+}
+
+.box.journal img {
+	box-shadow: 5px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Darken right border */
+.journal-div {
+  border-right: 1px solid #bfbfbf;
+}
+
+/* Style the links as buttons */
+.button {
+  @include base-button;
+  transition: all .25s ease;
+}
+
+/* Style the hover for these buttons. Underline is already present through other css */
+.button:hover {
+  background-color: #E21833;
+  color: white;
+  box-shadow: 5px 2px 5px rgba(0, 0, 0, 0.3);
+  transform: translate(0, -2px);
+}
+/* */
