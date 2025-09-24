@@ -3,12 +3,11 @@
 Welcome to this unofficial Janeway Docker image, developed by Erik Jones at the USMAI Library Consortium's Consortial Digital Initiatives team in communication with the Janeway dev team. This Docker image is designed to make Janeway flexible and scalable by optimizing it for use in containerized settings. Although this image is built for our upcoming Janeway Helm Chart, it can be used elsewhere provided the right environment variables are set.
 
 The main technical goals of this helm chart were to:
-1. Create a production-ready image pre-packaged with nginx and gunicorn
+1. Create a production-ready image
 2. Automate the Janeway install process
 3. Automate the Janeway upgrade process
 4. Automate the plugin install process
-5. Automate starting nginx and gunicorn
-6. Avoid forking or modifying the Janeway repository
+5. Avoid forking or modifying the Janeway repository
 
 Additional changes were made to optimize the Docker image for Kubernetes, such as:
 1. Identifying and consolidating dynamic data storage locations so that they can be persisted
@@ -23,7 +22,7 @@ The docker-compose I've provided is **NOT PRODUCTION READY** - it's intended to 
 
 ## Environment Variables
 
-There are many environment variables needed to make this application run properly. They're divided into five categories:
+There are many environment variables needed to make this application run properly. They're divided into four categories:
 1. Environment variables always required
 2. Environment variables only required when installing Janeway for the first time
 3. Optional environment variables

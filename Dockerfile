@@ -15,7 +15,7 @@ ENV VENV_PATH=/opt/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV STATIC_DIR=/var/www/janeway/collected-static
 ENV MEDIA_DIR=/var/www/janeway/media
-ENV JANEWAY_VERSION="1.8.2"
+ENV JANEWAY_VERSION="1.8.0-RC-8"
 ENV DB_VENDOR="postgres"
 ENV PYTHON_ENABLE_GUNICORN_MULTIWORKERS='true'
 
