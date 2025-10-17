@@ -1,16 +1,13 @@
 FROM python:3.11
 SHELL ["/bin/bash", "-c"]
 
-# Install debian dependencies
-#------------------------------------------------------
+# ----------------------- DEBIAN DEPENDENCIES -----------------------
 RUN apt-get update
 RUN apt-get install -y gettext pandoc cron postgresql-client \
     libxml2-dev libxslt1-dev zlib1g-dev libffi-dev \
     libssl-dev libjpeg-dev
 
-# Set environment variabes. 
-#------------------------------------------------------
-
+# ----------------------- ENVIRONMENT VARIABLES ---------------------
 ENV VENV_PATH=/opt/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV STATIC_DIR=/var/www/janeway/collected-static
@@ -22,31 +19,41 @@ ENV PYTHON_ENABLE_GUNICORN_MULTIWORKERS='true'
 # Create the virtual environment
 RUN python3 -m venv $VENV_PATH
 
+# ------------------------ JANEWAY MAIN PYTHON DEPENDENCIES ----------------------
+# Clone Janeway into tmp directory
+WORKDIR /tmp
+RUN git clone https://github.com/USMAI-Library-Consortium/janeway.git
+
 # Install Python required packages
+RUN mkdir -p /vol/janeway/
+RUN cp ./janeway/requirements.txt /vol/janeway
 WORKDIR /vol/janeway
-RUN mkdir gunicorn
-ADD ./janeway/requirements.txt /vol/janeway
 RUN source ${VENV_PATH}/bin/activate && pip3 install -r requirements.txt
 RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=23.0.0,<24.0.0'
-# Don't generate pycache files for the Janeway installation internally -
+
+
+# ----------------------- JANEWAY PLUGINS --------------------------
+# Copy all installable plugins into a temp directory, to be collected and installed later
+WORKDIR /vol/janeway/src/available-plugins
+RUN git clone https://github.com/openlibhums/pandoc_plugin.git --branch v1.0.0-RC-1
+RUN git clone https://github.com/openlibhums/back_content.git --branch v1.7.0-RC-1
+RUN git clone https://github.com/openlibhums/customstyling.git --branch v1.1.1
+RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master && pip3 install marshmallow
+RUN git clone https://github.com/openlibhums/imports.git --branch v1.11
+RUN source ${VENV_PATH}/bin/activate && pip3 install -r /vol/janeway/src/available-plugins/imports/requirements.txt
+RUN git clone https://github.com/openlibhums/portico.git
+RUN source ${VENV_PATH}/bin/activate && pip3 install -r /vol/janeway/src/available-plugins/portico/requirements.txt 
+RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
+RUN git clone https://github.com/openlibhums/datacite.git --branch v0.5.0
+
+# Don't generate pycache files for Janeway during runtime -
 # That's why its not with the other ENV Variables - I'm allowing
 # it for the pip3 install but not Janeway
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Copy all installable plugins into a temp directory, to be collected and installed later
-WORKDIR /vol/janeway/src/available-plugins
-RUN git clone https://github.com/openlibhums/pandoc_plugin.git --branch v1.0.0-RC-1
-RUN git clone https://github.com/openlibhums/back_content.git --branch v1.6.0-RC-1
-RUN git clone https://github.com/openlibhums/customstyling.git --branch v1.1.1
-RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master && pip3 install marshmallow
-RUN git clone https://github.com/openlibhums/imports.git --branch v1.10
-RUN git clone https://github.com/openlibhums/portico.git --branch master
-RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
-RUN git clone https://github.com/openlibhums/datacite.git --branch v0.4.0
-
-# Add the rest of the source code
-# Copy Janeway code
-COPY ./janeway/src/ /vol/janeway/src/
+# ----------------------- JANEWAY SOURCE CODE --------------------------
+WORKDIR /tmp/janeway
+RUN cp -r src /vol/janeway/
 # Copy custom settings file into Janeway
 COPY prod_settings.py /vol/janeway/src/core/
 # Copy kubernetes install and setup script into Janeway
@@ -60,9 +67,14 @@ COPY k8s_shared.py /vol/janeway/src/utils/
 # Copy custom themes into the themes folder & remove the gitignore
 COPY ./custom-themes/ /vol/janeway/src/themes/
 RUN rm -f /vol/janeway/src/themes/.gitignore
-# Create Janeway logs directory
+# Create Janeway logs directory. This was done due to some errors and should
+# be corrected another way in the future.
 RUN mkdir -p /vol/janeway/logs
 RUN touch /vol/janeway/logs/janeway.logs
+
+# Delete everything in the temp directory
+WORKDIR /vol/janeway
+RUN rm -r /tmp/janeway
 
 # Generate python bytecode files - they cannot be generated on the k8s because
 # Read-Only-Filesystems is enabled.
