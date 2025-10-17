@@ -58,7 +58,8 @@ export DJANGO_SUPERUSER_EMAIL=test@example.com
 export DJANGO_SUPERUSER_USERNAME=johndoe
 export DJANGO_SUPERUSER_PASSWORD=SuperSecureJaneway1234
 
-export INSTALL_CRON=TRUE
+export INSTALL_CRON=FALSE
+export INSTALL_IMPORTS_PLUGIN=True
 
 SUFFIX ?= $(shell date +%s)
 SUFFIX := ${SUFFIX}
