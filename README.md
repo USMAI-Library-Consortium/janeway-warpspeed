@@ -34,8 +34,7 @@ There are many environment variables needed to make this application run properl
 3. DB_NAME: Name of your db within postgres
 4. DB_USER: Name of the postgres user
 5. DB_PASSWORD: Password to connect to the postgres DB
-6. JANEWAY_PRESS_DOMAIN: Specifies the Press Domain to use when installing Janeway AND for nginx routing. MUST be the same as the domain name that you give Janeway on your Kubernetes cluster
-7. JANEWAY_PRESS_DOMAIN_SCHEME: The scheme for the Janeway domain, e.g. https://, used for CSRF protection
+6. JANEWAY_PRESS_URL: Specifies the URL of the press to use when installing Janeway. This also sets up internal network configuration, like CSRF and ALLOWED_HOSTS.
 
 ### Environment variables required ONLY when installing Janeway
 1. JANEWAY_PRESS_NAME: Specifies the Press Name to use when installing Janeway
@@ -48,21 +47,19 @@ There are many environment variables needed to make this application run properl
 
 ### Optional environment variables
 1. JANEWAY_JOURNAL_DESCRIPTION: Only used during Janeway install.
-2. JANEWAY_JOURNAL_DOMAIN: Used only during install, this command will specify the domain for the default journal.
-3. INSTALL_TYPESETTING_PLUGIN: Install the typesetting plugin - TRUE or FALSE, FALSE if not set
-4. INSTALL_PANDOC_PLUGIN: Install the pandoc plugin - TRUE or FALSE, FALSE if not set
-5. INSTALL_CUSTOMSTYLING_PLUGIN: Install the custom styling plugin - TRUE or FALSE, FALSE if not set
-6. INSTALL_PORTICO_PLUGIN: Install the portico plugin - TRUE or FALSE, FALSE if not set
-7. INSTALL_IMPORTS_PLUGIN: Install the imports plugin - TRUE or FALSE, FALSE if not set
-8. INSTALL_DOAJ_TRANSPORTER_PLUGIN: Install the doaj_transporter plugin - TRUE or FALSE, FALSE if not set
-9. INSTALL_BACK_CONTENT_PLUGIN: Install the back_content plugin - TRUE or FALSE, FALSE if not set
-10. INSTALL_REPORTING_PLUGIN: Install the reporting plugin - TRUE or FALSE, FALSE if not set
-11. INSTALL_DATACITE_PLUGIN: Install the DataCite plugin - TRUE or FALSE, FALSE if not set
-12. DJANGO_DEBUG: Whether to run Django in debug mode.
-13. PYTHON_ENABLE_GUNICORN_MULTIWORKERS: Enable Gunicorn multi worker multi thread config. 'true' or 'false', default true.
-14. PYTHON_GUNICORN_CUSTOM_WORKER_NUM: Set the number of Gunicorn workers. Only works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'. Default (2 * CPU Core number) + 1
-15. PYTHON_GUNICORN_CUSTOM_THREAD_NUM: Set the number of Gunicorn worker threads. Only works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'. Default 1.
+2. INSTALL_TYPESETTING_PLUGIN: Install the typesetting plugin - TRUE or FALSE, FALSE if not set
+3. INSTALL_PANDOC_PLUGIN: Install the pandoc plugin - TRUE or FALSE, FALSE if not set
+4. INSTALL_CUSTOMSTYLING_PLUGIN: Install the custom styling plugin - TRUE or FALSE, FALSE if not set
+5. INSTALL_PORTICO_PLUGIN: Install the portico plugin - TRUE or FALSE, FALSE if not set
+6. INSTALL_IMPORTS_PLUGIN: Install the imports plugin - TRUE or FALSE, FALSE if not set
+7. INSTALL_DOAJ_TRANSPORTER_PLUGIN: Install the doaj_transporter plugin - TRUE or FALSE, FALSE if not set
+8. INSTALL_BACK_CONTENT_PLUGIN: Install the back_content plugin - TRUE or FALSE, FALSE if not set
+9. INSTALL_REPORTING_PLUGIN: Install the reporting plugin - TRUE or FALSE, FALSE if not set
+10. INSTALL_DATACITE_PLUGIN: Install the DataCite plugin - TRUE or FALSE, FALSE if not set
+11. DJANGO_DEBUG: Whether to run Django in debug mode.
+12. PYTHON_ENABLE_GUNICORN_MULTIWORKERS: Enable Gunicorn multi worker multi thread config. 'true' or 'false', default true.
+13. PYTHON_GUNICORN_CUSTOM_WORKER_NUM: Set the number of Gunicorn workers. Only works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'. Default (2 * CPU Core number) + 1
+14. PYTHON_GUNICORN_CUSTOM_THREAD_NUM: Set the number of Gunicorn worker threads. Only works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'. Default 1.
 
 ### Conditionally required environment variables
-1. JANEWAY_JOURNAL_DOMAINS: If Janeway has domains for journals, this is required. Comma separated array (no spaces after commas)
-2. JANEWAY_JOURNAL_DOMAIN_SCHEMES: If Janeway has domains for journals, this is required. Schemes are, for example, https://. Comma separated array (no spaces after commas). Each scheme must match a domain in JANEWAY_JOURNAL_DOMAINS by index.
+1. JANEWAY_JOURNAL_URLS: If Janeway has seperate URLs for journals, this is required. Comma separated array (no spaces after commas). WHEN INSTALLING, THE FIRST URL WILL BE USED AS THE DOMAIN FOR THE AUTO-CREATED JOURNAL. This also sets up internal network configuration, like CSRF and ALLOWED_HOSTS.

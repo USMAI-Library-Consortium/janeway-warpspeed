@@ -2,7 +2,7 @@
 set -e
 
 # Ensure required environment variables are set
-for var in DB_HOST DB_PORT DB_NAME DB_USER DB_PASSWORD JANEWAY_VERSION JANEWAY_PORT JANEWAY_PRESS_DOMAIN; do
+for var in DB_HOST DB_PORT DB_NAME DB_USER DB_PASSWORD JANEWAY_VERSION JANEWAY_PORT; do
     if [[ -z "${!var}" ]]; then
         echo "Missing required environment variable: $var"
         exit 1
@@ -47,13 +47,29 @@ else
 fi
 
 if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
+    # Janeway IS installed
+
     # Ensure required environment variables are set
-    for var in JANEWAY_PRESS_NAME JANEWAY_PRESS_DOMAIN JANEWAY_PRESS_CONTACT JANEWAY_JOURNAL_CODE JANEWAY_JOURNAL_NAME; do
+    for var in JANEWAY_PRESS_NAME JANEWAY_PRESS_URL JANEWAY_PRESS_CONTACT JANEWAY_JOURNAL_CODE JANEWAY_JOURNAL_NAME; do
         if [[ -z "${!var}" ]]; then
             echo "Missing required environment variable: $var"
             exit 1
         fi
     done
+
+    # Set the JANEWAY_PRESS_DOMAIN to the netloc of the URL so it will be autoinstalled
+    export JANEWAY_PRESS_DOMAIN=$(python3 /usr/local/bin/extract_press_netloc.py)
+
+    # Set the JANEWAY_JOURNAL_DOMAIN variable based on the FIRST value of 
+    # JANEWAY_JOURNAL_DOMAINS (if present). This will be the domain for the 
+    # default journal. 
+    export JANEWAY_JOURNAL_DOMAIN=$(python3 /usr/local/bin/extract_default_journal_domain.py)
+
+    if [[ -z "$JANEWAY_JOURNAL_DOMAIN" ]]; then
+        echo "No Janeway Journal Domain"
+    else
+        echo "Default Janeway Journal Domain is $JANEWAY_JOURNAL_DOMAIN"
+    fi
     
     python3 src/manage.py install_janeway --use-defaults 2>&1
     python3 src/manage.py createsuperuser --no-input --email="$DJANGO_SUPERUSER_EMAIL" 2>&1
@@ -67,7 +83,9 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
         echo "Install Failed"
         exit 1
     fi
+# Janeway is NOT installed
 else
+    # Read the installed application version
     INSTALLED_APPLICATION_VERSION=$(cat /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION)
     INCOMING_APPLICATION_VERSION=$JANEWAY_VERSION
 

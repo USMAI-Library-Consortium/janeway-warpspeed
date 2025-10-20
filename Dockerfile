@@ -52,7 +52,7 @@ RUN git clone https://github.com/openlibhums/datacite.git --branch v0.5.0
 # it for the pip3 install but not Janeway
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# ----------------------- JANEWAY SOURCE CODE --------------------------
+# ----------------------- JANEWAY SOURCE CODE & SUPPORTING FILES --------------------------
 WORKDIR /tmp/janeway
 RUN cp -r src /vol/janeway/
 # Copy custom settings file into Janeway
@@ -68,6 +68,10 @@ COPY k8s_shared.py /vol/janeway/src/utils/
 # Copy custom themes into the themes folder & remove the gitignore
 COPY ./custom-themes/ /vol/janeway/src/themes/
 RUN rm -f /vol/janeway/src/themes/.gitignore
+# Copy code that extracts the default journal domain
+COPY extract_default_journal_domain.py /usr/local/bin/
+# Copy code that extracts the press netloc
+COPY extract_press_netloc.py /usr/local/bin/
 # Create Janeway logs directory. This was done due to some errors and should
 # be corrected another way in the future.
 RUN mkdir -p /vol/janeway/logs
