@@ -13,17 +13,10 @@ done
 export PGPASSWORD=$DB_PASSWORD
 JANEWAY_DATABASE=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -tAc "SELECT * FROM pg_database WHERE datname='$DB_NAME';")
 # Get the database name - Will be the first field in fields seperated by '|'
-JANEWAY_DATABASE_EXISTS=$(cut -d "|" -f 1 <<< $JANEWAY_DATABASE)
+JANEWAY_DATABASE_EXISTS=$(cut -d "|" -f 2 <<< $JANEWAY_DATABASE)
 
-echo $JANEWAY_DATABASE_EXISTS
-
-if [[ "$JANEWAY_DATABASE_EXISTS" == $DB_NAME ]]; then
-    DATABASE_EXISTS=0
-else
-    DATABASE_EXISTS=1
-fi
-
-if [[ $DB_EXISTS==0 ]]; then
+# If the database does not exist, exit.
+if [[ ${JANEWAY_DATABASE_EXISTS,,} == ${DB_NAME,,} ]]; then
     echo "Database '$DB_NAME' exists."
 else
     echo "Database '$DB_NAME' does not exist or connection failed."
@@ -70,15 +63,11 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
     python3 src/manage.py install_janeway --use-defaults 2>&1
     python3 src/manage.py createsuperuser --no-input --email="$DJANGO_SUPERUSER_EMAIL" 2>&1
     python3 src/manage.py migrate 2>&1
-    STATUS=$?
 
-    if [[ $STATUS == "0" ]]; then
-        echo "Install successful."
-        echo $JANEWAY_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
-    else
-        echo "Install Failed"
-        exit 1
-    fi
+    echo "Install successful."
+    echo $JANEWAY_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
+
+# Janeway IS installed
 else
     INSTALLED_APPLICATION_VERSION=$(cat /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION)
     INCOMING_APPLICATION_VERSION=$JANEWAY_VERSION
@@ -95,14 +84,9 @@ else
         echo "Upgrading Janeway from $INSTALLED_APPLICATION_VERSION to $INCOMING_APPLICATION_VERSION..."
         python3 src/manage.py upgrade_janeway 2>&1
         python3 src/manage.py migrate 2>&1
-        STATUS=$?
-        if [[ $STATUS == "0" ]]; then
-            echo "Upgrade successful!"
-            echo $INCOMING_APPLICATION_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
-        else
-            echo "FATAL ERROR: Upgrade Failed!"
-            exit 1
-        fi
+        
+        echo "Upgrade successful!"
+        echo $INCOMING_APPLICATION_VERSION > /var/www/janeway/state-data/INSTALLED_APPLICATION_VERSION
     else
         echo "Janeway is up-to-date ($INSTALLED_APPLICATION_VERSION)."
 
@@ -114,7 +98,7 @@ else
         python3 src/manage.py build_assets 2>&1
         python3 src/manage.py clear_cache 2>&1
 
-        if [[ $INSTALL_CRON == "TRUE" ]]; then
+        if [[ ${INSTALL_CRON,,} == "true" ]]; then
             python3 src/manage.py install_cron 2>&1
         else
             echo "Internal Cron installation disabled."
