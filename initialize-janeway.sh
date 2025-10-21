@@ -2,7 +2,7 @@
 set -e
 
 # Ensure required environment variables are set
-for var in DB_HOST DB_PORT DB_NAME DB_USER DB_PASSWORD JANEWAY_VERSION JANEWAY_PORT JANEWAY_PRESS_DOMAIN; do
+for var in DB_HOST DB_PORT DB_NAME DB_USER DB_PASSWORD JANEWAY_VERSION JANEWAY_PORT; do
     if [[ -z "${!var}" ]]; then
         echo "Missing required environment variable: $var"
         exit 1
@@ -46,6 +46,7 @@ else
     echo "Janeway application is not installed."
 fi
 
+# Janeway is NOT installed
 if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
     # Ensure required environment variables are set
     for var in JANEWAY_PRESS_NAME JANEWAY_PRESS_DOMAIN JANEWAY_PRESS_CONTACT JANEWAY_JOURNAL_CODE JANEWAY_JOURNAL_NAME; do
@@ -54,6 +55,17 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
             exit 1
         fi
     done
+
+    # Get the domain for the default journal from the list of journal domains.
+    # If there are no journal domains or if the DEFAULT_JOURNAL_DOMAIN_INDEX is not set
+    # this will be empty
+    export JANEWAY_JOURNAL_DOMAIN=$(python3 /usr/local/bin/extract_default_journal_domain.py)
+
+    if [[ -z "$JANEWAY_JOURNAL_DOMAIN" ]]; then
+        echo "No Janeway Journal Domain Specified"
+    else
+        echo "Domain for the Auto-Installed Janeway Journal is $JANEWAY_JOURNAL_DOMAIN"
+    fi
     
     python3 src/manage.py install_janeway --use-defaults 2>&1
     python3 src/manage.py createsuperuser --no-input --email="$DJANGO_SUPERUSER_EMAIL" 2>&1
