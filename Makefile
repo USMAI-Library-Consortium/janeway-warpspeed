@@ -1,3 +1,6 @@
+export
+# TO MODIFY VARIABLES, CREATE A 'Makefile.local' FILE
+
 # Exposed ports
 JANEWAY_PORT=8000
 PGADMIN_PORT=8001
@@ -28,42 +31,29 @@ ifdef DEBUG_SMTP
 	JANEWAY_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 	JANEWAY_EMAIL_HOST=janeway-debug-smtp
 	JANEWAY_EMAIL_PORT=1025
-	JANEWAY_EMAIL_USE_TLS=
+	JANEWAY_EMAIL_USE_TLS=0
 endif
 
-export DB_HOST
-export DB_PORT
-export DB_NAME
-export DB_USER
-export DB_PASSWORD
-export JANEWAY_PORT
-export PGADMIN_PORT
-
-export JANEWAY_EMAIL_BACKEND
-export JANEWAY_EMAIL_HOST
-export JANEWAY_EMAIL_PORT
-export JANEWAY_EMAIL_USE_TLS
-
-export JANEWAY_ENABLE_ORCID
-
 # Install variables
-export JANEWAY_PRESS_NAME=Test Press
-export JANEWAY_PRESS_DOMAIN=localhost:${JANEWAY_PORT}
-export JANEWAY_PRESS_DOMAIN_SCHEME=http://
-export JANEWAY_PRESS_CONTACT=test@example.com
-export JANEWAY_JOURNAL_CODE=test_journal
-export JANEWAY_JOURNAL_NAME=New Test Journal
+JANEWAY_PRESS_NAME=Test Press
+JANEWAY_PRESS_DOMAIN=localhost:${JANEWAY_PORT}
+JANEWAY_PRESS_DOMAIN_SCHEME=http://
+JANEWAY_PRESS_CONTACT=test@example.com
+JANEWAY_JOURNAL_CODE=test_journal
+JANEWAY_JOURNAL_NAME=New Test Journal
 
-export DJANGO_SUPERUSER_EMAIL=test@example.com
-export DJANGO_SUPERUSER_USERNAME=johndoe
-export DJANGO_SUPERUSER_PASSWORD=SuperSecureJaneway1234
+DJANGO_SUPERUSER_EMAIL=test@example.com
+DJANGO_SUPERUSER_USERNAME=johndoe
+DJANGO_SUPERUSER_PASSWORD=SuperSecureJaneway1234
 
-export INSTALL_CRON=FALSE
-export INSTALL_IMPORTS_PLUGIN=True
+INSTALL_CRON=FALSE
+DJANGO_DEBUG=True
 
 SUFFIX ?= $(shell date +%s)
 SUFFIX := ${SUFFIX}
 DATE := `date +"%y-%m-%d"`
+
+-include Makefile.local
 
 .PHONY: janeway
 all: help
