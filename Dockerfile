@@ -67,6 +67,8 @@ COPY k8s_shared.py /vol/janeway/src/utils/
 # Copy custom themes into the themes folder & remove the gitignore
 COPY ./custom-themes/ /vol/janeway/src/themes/
 RUN rm -f /vol/janeway/src/themes/.gitignore
+# Copy code that extracts the default journal domain
+COPY extract_default_journal_domain.py /usr/local/bin/
 # Create Janeway logs directory. This was done due to some errors and should
 # be corrected another way in the future.
 RUN mkdir -p /vol/janeway/logs
