@@ -12,7 +12,7 @@ ENV VENV_PATH=/opt/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV STATIC_DIR=/var/www/janeway/collected-static
 ENV MEDIA_DIR=/var/www/janeway/media
-ENV JANEWAY_VERSION="1.8.0-RC-8"
+ENV JANEWAY_VERSION="1.8.0-RC-9"
 ENV DB_VENDOR="postgres"
 ENV PYTHON_ENABLE_GUNICORN_MULTIWORKERS='true'
 
@@ -23,7 +23,7 @@ RUN python3 -m venv $VENV_PATH
 # Clone Janeway into tmp directory
 WORKDIR /tmp
 RUN git clone https://github.com/openlibhums/janeway.git
-RUN cd janeway && git switch --detach v1.8.0-RC-8
+RUN cd janeway && git switch --detach v1.8.0-RC-9
 
 # Install Python required packages
 RUN mkdir -p /vol/janeway/
