@@ -1,0 +1,39 @@
+/* Insert CSS Below */
+
+.banner-alert {
+  display: block !important;
+  background-color: yellow;
+  width: 100%;
+  border: 1px solid black;
+  padding: .5rem .5rem;
+}
+
+.banner-alert h2 {
+  font-size: 1.5rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.button {
+    font-family: SANS-SERIF;
+    text-transform: uppercase;
+    font-weight: 700;
+    background-color: #e21833;
+    color: white;
+    transition: all .25s ease;
+}
+
+.hero__title {
+  top: auto;
+  bottom: 5%; /* vertical position */
+  left: 45%; /* horizontal position */
+  font-size: 3.5rem;
+  font-style: normal;
+  background-color: white;
+  transform: skew(-10deg);
+  padding: 0 1rem;
+}
+
+.title {
+ text-align: left; 
+}
