@@ -43,4 +43,7 @@ if journal_domains:
         if domain:
             CSRF_TRUSTED_ORIGINS.append(journal_domain_schemes[i] + journal_domains[i])
 
+# Allow Django to understand from Nginx when a request is SSL
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 LOGGING['handlers']['log_file']['filename'] = "/var/www/janeway/logs/janeway.log"
