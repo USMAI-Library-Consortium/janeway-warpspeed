@@ -62,6 +62,8 @@ if [[ "$JANEWAY_INSTALLED" == "1" ]]; then
     
     python3 src/manage.py install_janeway --use-defaults 2>&1
     python3 src/manage.py createsuperuser --no-input --email="$DJANGO_SUPERUSER_EMAIL" 2>&1
+    echo "Running plugin update/install process..."
+    python3 src/manage.py manage_plugins 2>&1
     python3 src/manage.py migrate 2>&1
 
     echo "Install successful."
