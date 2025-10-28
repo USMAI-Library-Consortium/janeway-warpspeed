@@ -45,5 +45,6 @@ if journal_domains:
 
 # Allow Django to understand from Nginx when a request is SSL
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 LOGGING['handlers']['log_file']['filename'] = "/var/www/janeway/logs/janeway.log"
