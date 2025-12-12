@@ -1,0 +1,99 @@
+/* Insert CSS Below */
+.banner-alert {
+  display: block !important;
+  background-color: yellow;
+  width: 100%;
+  border: 1px solid black;
+  padding: .5rem .5rem;
+}
+
+.banner-alert h2 {
+  font-size: 1.5rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+:root {
+  --primary: #F4B810;
+  --menu-background-color: black;
+  --menu-foreground-color: white;
+  --button-text-color: black;
+}
+
+.header-stripe {
+  display: none;
+}
+
+.button {
+  color: black;
+}
+
+.menu.vertical.medium-horizontal.dropdown {
+  border-top: 1.5px solid var(--primary);
+  border-bottom: 1.5px solid var(--primary);
+}
+
+.main-footer__top {
+ background-color: black;
+}
+
+.main-footer__janeway-logo > svg > path {
+  	fill: white;
+}
+
+.main-footer__message > p {
+  color: white;
+}
+
+.main-footer__links {
+  background-color: #323232;
+}
+
+.hero__slogan-container {
+  top: 10%;
+  left: 15%;
+}
+
+.hero__slogan-container > p {
+  color: white;
+  margin: 0;
+  font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 3rem;
+  line-height: 1.25;
+  font-style: italic;
+}
+
+@media print, screen and (max-width: 1525px) {
+  .hero__slogan-container > p {
+  		font-size: 2.5rem;
+	}
+}
+
+@media print, screen and (max-width: 1250px) {
+  .hero__slogan-container {
+    top: 8%;
+    left: 8%;
+  }
+}
+
+@media print, screen and (max-width: 1050px) {
+  .hero__slogan-container > p {
+  		font-size: 2rem;
+	}
+}
+
+.hero__title {
+  top: auto;
+  left: auto;
+  bottom: 5%; /* vertical position */
+  right: 18%; /* horizontal position */
+  font-size: 3.5rem;
+  font-style: normal;
+  background-color: white;
+  transform: skew(-10deg);
+  padding: 0 1rem;
+}
+
+.hero__image {
+  object-position: center;
+}
