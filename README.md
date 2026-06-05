@@ -20,7 +20,7 @@ All setup and configuration options are set with environment variables. Please n
 
 The docker-compose I've provided is **NOT PRODUCTION READY** - it's intended to test the image is working properly. Feel free to base your own docker-compose off of this one - and I'm sure the community would love if you put in a pull request for whatever improvements you make!
 
-The docker-compose is supposed to be run through Make! You can run the application by typing 'make janeway'. You can uninstall the application by typing 'make uninstall'.
+The docker-compose is supposed to be run through Make. You can run the application by typing 'make janeway'. You can uninstall the application by typing 'make uninstall'.
 
 Don't modify the Makefile or docker-compose if you just want to change Janeway settings. Instead, create a file called 'Makefile.local' in the root of this repository. There, you can override or set any environment variables used to configure Janeway. This will not interfere with Git, as I've set Git to ignore that file. 
 
