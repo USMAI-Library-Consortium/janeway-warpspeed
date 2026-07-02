@@ -7,14 +7,21 @@ RUN apt-get install -y gettext pandoc cron postgresql-client \
     libxml2-dev libxslt1-dev zlib1g-dev libffi-dev \
     libssl-dev libjpeg-dev
 
+
+# --------------- ARGUMENTS FOR BUILDING THE IMAGE -------------------
+ARG CLONE_REPOSITORY_URL=https://github.com/openlibhums/janeway.git
+ARG CLONE_TAG_VERSION=v1.8.0
+ARG JANEWAY_VERSION=v1.8.0
+
+
 # ----------------------- ENVIRONMENT VARIABLES ---------------------
 ENV VENV_PATH=/opt/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV STATIC_DIR=/var/www/janeway/collected-static
 ENV MEDIA_DIR=/var/www/janeway/media
-ENV JANEWAY_VERSION="1.8.0-RC-9"
 ENV DB_VENDOR="postgres"
 ENV PYTHON_ENABLE_GUNICORN_MULTIWORKERS='true'
+ENV JANEWAY_VERSION=$JANEWAY_VERSION
 
 # Create the virtual environment
 RUN python3 -m venv $VENV_PATH
@@ -22,30 +29,15 @@ RUN python3 -m venv $VENV_PATH
 # ------------------------ JANEWAY MAIN PYTHON DEPENDENCIES ----------------------
 # Clone Janeway into tmp directory
 WORKDIR /tmp
-RUN git clone https://github.com/openlibhums/janeway.git
-RUN cd janeway && git switch --detach v1.8.0-RC-9
+RUN git clone ${CLONE_REPOSITORY_URL}
+RUN cd janeway && git switch --detach ${CLONE_TAG_VERSION}
 
 # Install Python required packages
 RUN mkdir -p /vol/janeway/
 RUN cp ./janeway/requirements.txt /vol/janeway
 WORKDIR /vol/janeway
 RUN source ${VENV_PATH}/bin/activate && pip3 install -r requirements.txt
-RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=23.0.0,<24.0.0'
-
-
-# ----------------------- JANEWAY PLUGINS --------------------------
-# Copy all installable plugins into a temp directory, to be collected and installed later
-WORKDIR /vol/janeway/src/available-plugins
-RUN git clone https://github.com/openlibhums/pandoc_plugin.git --branch v1.0.0-RC-1
-RUN git clone https://github.com/openlibhums/back_content.git --branch v1.7.0-RC-1
-RUN git clone https://github.com/openlibhums/customstyling.git --branch v1.1.1
-RUN git clone https://github.com/openlibhums/doaj_transporter.git --branch master && pip3 install marshmallow
-RUN git clone https://github.com/openlibhums/imports.git --branch v1.11
-RUN source ${VENV_PATH}/bin/activate && pip3 install -r /vol/janeway/src/available-plugins/imports/requirements.txt
-RUN git clone https://github.com/openlibhums/portico.git
-RUN source ${VENV_PATH}/bin/activate && pip3 install -r /vol/janeway/src/available-plugins/portico/requirements.txt 
-RUN git clone https://github.com/openlibhums/reporting.git --branch v1.3-RC-1
-RUN git clone https://github.com/openlibhums/datacite.git --branch v0.5.0
+RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=26.0.0,<27.0.0'
 
 # Don't generate pycache files for Janeway during runtime -
 # That's why its not with the other ENV Variables - I'm allowing
@@ -63,11 +55,10 @@ COPY autorun.sh /vol/janeway/docker/
 COPY initialize-janeway.sh /vol/janeway/docker/
 # Copy auto-install auto-update janeway install command into django commands
 COPY ./commands/ /vol/janeway/src/utils/management/commands/
+# Make available plugins directory
+RUN mkdir -p /vol/janeway/src/available-plugins
 # Copy additional shared functions into the utils folder
 COPY k8s_shared.py /vol/janeway/src/utils/
-# Copy custom themes into the themes folder & remove the gitignore
-COPY ./custom-themes/ /vol/janeway/src/themes/
-RUN rm -f /vol/janeway/src/themes/.gitignore
 # Copy code that extracts the default journal domain
 COPY extract_default_journal_domain.py /usr/local/bin/
 # Create Janeway logs directory. This was done due to some errors and should
