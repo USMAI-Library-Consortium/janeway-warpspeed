@@ -40,7 +40,8 @@ reasonably-up-to-date Janeway version, you can swap the Janeway version when
 building your image with these 3 variables:
 
 `CLONE_REPOSITORY_URL`: The git repository containing your version of Janeway
-`CLONE_TAG_VERSION`: The tag of Janeway that you wish to use
+`CLONE_TAG_VERSION`: The tag of Janeway that you wish to use. This can also
+  be a specific commit.
 `JANEWAY_VERSION`: Ideally, a version representing an official Janeway release.
 If you have your own Janeway source code, you can still use the offical Janeway
 release but suffix it with an incrementing number (i.e. v1.8.0-2, v1.8.0-3).

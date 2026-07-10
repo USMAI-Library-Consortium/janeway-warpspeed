@@ -1,0 +1,77 @@
+name: Publish Docker Image
+
+on:
+  release:
+    types: [published] # Release and Pre-Release
+    
+jobs:
+  Publish-Docker-Image:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Choose Repository and Tag
+        id: tags
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        shell: bash
+        run: |-
+          if [[ "$TAG_NAME" =~ .*usmai.* ]]; then
+            echo "USMAI Docker Image"
+            CLONE_REPOSITORY_URL="https://github.com/USMAI-Library-Consortium/janeway.git"
+          elif [[ "$TAG_NAME" =~ .*base.* ]]; then
+            echo "Open Source Docker Image"
+            CLONE_REPOSITORY_URL="https://github.com/openlibhums/janeway.git"
+          else
+            echo "Unknown Dockerfile Variant."
+            exit 1
+          fi
+
+          # Set the tag version to check out (release tag minus build version)
+
+          regex_pattern="^(v?[0-9]+\.[0-9]+\.[0-9]+\.[a-z]+\.[0-9]+)-([0-9]+)$"
+          if [[ "$TAG_NAME" =~ $regex_pattern ]]; then
+            CLONE_TAG_VERSION=${BASH_REMATCH[1]}
+            BUILD_VERSION=${BASH_REMATCH[2]}
+            echo "Choosing tag ${CLONE_TAG_VERSION}. Docker Build Version ${BUILD_VERSION}."
+          else
+            echo "Invalid Tag ${TAG_NAME}"
+            exit 1
+          fi
+
+          if [[ $CLONE_TAG_VERSION =~ ^(.*)\.base\.0$ ]]; then
+            # Use Janeway version by stripping base
+            CLONE_TAG_VERSION=${BASH_REMATCH[1]}
+          fi
+
+          echo "clone_repository_url=${CLONE_REPOSITORY_URL}" >> "$GITHUB_OUTPUT"
+          echo "clone_tag_version=${CLONE_TAG_VERSION}" >> "$GITHUB_OUTPUT"
+      
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to the Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/usmai-library-consortium/janeway:${{ github.event.release.tag_name }}
+          build-args: |
+            CLONE_REPOSITORY_URL=${{ steps.tags.outputs.clone_repository_url }}
+            CLONE_TAG_VERSION=${{ steps.tags.outputs.clone_tag_version }}
+            JANEWAY_VERSION=${{ steps.tags.outputs.clone_tag_version }}
