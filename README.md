@@ -178,6 +178,8 @@ source code.
 `ghcr.io/usmai-library-consortium/janeway-usmai`, containing the forked USMAI
 Janeway code.
 
+Images are built for x86-64 (amd64) and arm64 CPU architectures.
+
 ### Triggering Image Publishing & Tag Naming
 
 Image publishing is triggered with GitHub releases. Releases must have a
