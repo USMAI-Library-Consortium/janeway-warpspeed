@@ -30,8 +30,8 @@ jobs:
             exit 1
           fi
 
-          # Set the tag version to check out (release tag minus build version)
-
+          # Remove Build Version from the tag, which should match a release
+          # tag in the USMAI fork. 
           regex_pattern="^(v?[0-9]+\.[0-9]+\.[0-9]+\.[a-z]+\.[0-9]+)-([0-9]+)$"
           if [[ "$TAG_NAME" =~ $regex_pattern ]]; then
             CLONE_TAG_VERSION=${BASH_REMATCH[1]}
@@ -42,8 +42,12 @@ jobs:
             exit 1
           fi
 
-          if [[ $CLONE_TAG_VERSION =~ ^(.*)\.base\.0$ ]]; then
-            # Use Janeway version by stripping base
+          # Remove Variant Version from Clone Tag IF Official Janeway repo.
+          # Official Janeway tags are in the format vN.N.N, so here I'm removing
+          # the '.base.N' suffix so that it can match their tag exactly during 
+          # the Git Checkout in the Dockerfile. Build version was already removed
+          # in the previous step.
+          if [[ $CLONE_TAG_VERSION =~ ^(.*)\.base\.[0-9]$ ]]; then
             CLONE_TAG_VERSION=${BASH_REMATCH[1]}
           fi
 
