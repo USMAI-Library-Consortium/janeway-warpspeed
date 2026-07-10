@@ -20,9 +20,11 @@ jobs:
           if [[ "$TAG_NAME" =~ .*usmai.* ]]; then
             echo "USMAI Docker Image"
             CLONE_REPOSITORY_URL="https://github.com/USMAI-Library-Consortium/janeway.git"
+            GHCR_REPO="janeway-usmai"
           elif [[ "$TAG_NAME" =~ .*base.* ]]; then
             echo "Open Source Docker Image"
             CLONE_REPOSITORY_URL="https://github.com/openlibhums/janeway.git"
+            GHCR_REPO="janeway"
           else
             echo "Unknown Dockerfile Variant."
             exit 1
@@ -47,6 +49,7 @@ jobs:
 
           echo "clone_repository_url=${CLONE_REPOSITORY_URL}" >> "$GITHUB_OUTPUT"
           echo "clone_tag_version=${CLONE_TAG_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "ghcr_repo=${GHCR_REPO}" >> "$GITHUB_OUTPUT"
       
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -70,7 +73,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/usmai-library-consortium/janeway:${{ github.event.release.tag_name }}
+          tags: ghcr.io/usmai-library-consortium/${{ steps.tags.outputs.ghcr_repo }}:${{ github.event.release.tag_name }}
           build-args: |
             CLONE_REPOSITORY_URL=${{ steps.tags.outputs.clone_repository_url }}
             CLONE_TAG_VERSION=${{ steps.tags.outputs.clone_tag_version }}
