@@ -165,3 +165,38 @@ commas). Domain only, no schemes (e.g., https://)
 journals, this is required to configure internal networking. Schemes are, for
 example, https://. Comma separated list (no spaces after commas). Each scheme
 must match a domain in JANEWAY_JOURNAL_DOMAINS by index.
+
+## GitHub Actions for Docker Image Publishing
+
+This repository is designed to automatically publish Docker Images using GitHub
+actions. Images are published to the GitHub Container Registry (GHCR). There
+are two repositories that they're published to:
+
+`ghcr.io/usmai-library-consortium/janeway`, containing the official Janeway
+source code.
+
+`ghcr.io/usmai-library-consortium/janeway-usmai`, containing the forked USMAI
+Janeway code.
+
+### Triggering Image Publishing & Tag Naming
+
+Image publishing is triggered with GitHub releases. Releases must have a
+tag matching a specific regular expression pattern. It is VERY IMPORTANT
+that this is done correctly, as it impacts not only which version of Janeway
+is chosen to build but also impacts the application update process.
+
+The tag naming scheme uses this format: `<janeway.source.tag.(usmai|base).fork_variant-build_version>`. 
+
+For example: `v1.8.3.base.0-3`
+
+* `v1.8.3`: The official tag to use from the Janeway repo.
+* `.base`: Use the base Janeway source code (official OLH repo).
+* `.0`: The variant of the code. This isn't relevant for the official
+  repo because we aren't modifying their code, but it's there to make the
+  tags match in format.
+* `-3`: The build version. Used if we need to publish a new version of the
+  image with the same code version as the previous version. Differentiates
+  the image without causing Janeway to update.
+
+For the USMAI variant: `v1.8.3.usmai.3-3`. The `usmai.3` portion indicates that
+it's the 3rd revision of our fork based off Janeway `v1.8.3`. 
