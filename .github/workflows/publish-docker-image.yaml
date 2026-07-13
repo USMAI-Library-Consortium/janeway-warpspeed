@@ -19,7 +19,7 @@ jobs:
         run: |-
           if [[ "$TAG_NAME" =~ .*usmai.* ]]; then
             echo "USMAI Docker Image"
-            CLONE_REPOSITORY_URL="https://github.com/USMAI-Library-Consortium/janeway.git"
+            CLONE_REPOSITORY_URL="https://github.com/umd-lib/janeway.git"
             GHCR_REPO="janeway-usmai"
           elif [[ "$TAG_NAME" =~ .*base.* ]]; then
             echo "Open Source Docker Image"
