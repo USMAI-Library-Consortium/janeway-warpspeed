@@ -55,8 +55,6 @@ COPY autorun.sh /vol/janeway/docker/
 COPY initialize-janeway.sh /vol/janeway/docker/
 # Copy auto-install auto-update janeway install command into django commands
 COPY ./commands/ /vol/janeway/src/utils/management/commands/
-# Make available plugins directory
-RUN mkdir -p /vol/janeway/src/available-plugins
 # Copy additional shared functions into the utils folder
 COPY k8s_shared.py /vol/janeway/src/utils/
 # Copy code that extracts the default journal domain
@@ -65,6 +63,15 @@ COPY extract_default_journal_domain.py /usr/local/bin/
 # be corrected another way in the future.
 RUN mkdir -p /vol/janeway/logs
 RUN touch /vol/janeway/logs/janeway.logs
+
+# This is so our forked Janeway repo can also store our desired plugins. You will
+# likely want to extend our open-source Janeway image and clone the plugins in
+# that Dockerfile rather than re-build the base image with a custom fork.
+# Make available plugins directory if does not exist
+RUN mkdir -p /vol/janeway/src/available-plugins
+RUN mkdir -p available-plugins
+# Copy included plugins into available plugins directory
+RUN cp -r available-plugins/. /vol/janeway/src/available-plugins
 
 # Delete everything in the temp directory
 WORKDIR /vol/janeway
