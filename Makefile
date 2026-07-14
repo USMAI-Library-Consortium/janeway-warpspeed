@@ -61,7 +61,7 @@ run: janeway
 help:		## Show this help.
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 janeway:	## Run Janeway web server in attached mode. If NO_DEPS is not set, runs all dependant services detached.
-	docker-compose build
+	docker-compose build $(BUILD_ARGS)
 	-docker-compose run --rm start_janeway_dependencies || true
 	-docker-compose run --rm start_nginx_dependencies || true
 	-docker-compose up || true
