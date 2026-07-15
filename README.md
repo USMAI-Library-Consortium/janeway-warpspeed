@@ -96,7 +96,9 @@ repository. There, you can override or set any environment variables used to
 configure Janeway. This will not interfere with Git, as I've set Git to ignore
 that file.
 
-You'll have to include the 3 docker arguments to get it to work, in this manner:
+You must include the following BUILD_ARGS environment variable to run the
+docker-compose. Note that this example uses our git repository, not the base
+Janeway repository.
 
 `export BUILD_ARGS="--build-arg CLONE_REPOSITORY_URL=https://github.com/umd-lib/janeway --build-arg CLONE_TAG_VERSION=v1.8.0.usmai.1 --build-arg JANEWAY_VERSION=v1.8.0"`
 

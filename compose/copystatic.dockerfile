@@ -1,5 +1,8 @@
 FROM alpine:3.14
 
+ARG CLONE_REPOSITORY_URL
+ARG CLONE_TAG_VERSION
+
 RUN apk add bash git
 
 RUN mkdir -p /vol/janeway/src/transform/xsl \
@@ -7,8 +10,8 @@ RUN mkdir -p /vol/janeway/src/transform/xsl \
 
 # Clone Janeway into tmp directory
 WORKDIR /tmp
-RUN git clone https://github.com/openlibhums/janeway.git
-RUN cd janeway && git switch --detach v1.8.0-RC-8
+RUN git clone ${CLONE_REPOSITORY_URL}
+RUN cd janeway && git switch --detach ${CLONE_TAG_VERSION}
 
 RUN cp -r ./janeway/src/transform/xsl/ /vol/janeway/src/transform/xsl
 RUN cp -r ./janeway/src/static/ /vol/janeway/src/static/
