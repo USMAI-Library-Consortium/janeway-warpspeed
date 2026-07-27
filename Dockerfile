@@ -29,7 +29,7 @@ RUN python3 -m venv $VENV_PATH
 # ------------------------ JANEWAY MAIN PYTHON DEPENDENCIES ----------------------
 # Clone Janeway into tmp directory
 WORKDIR /tmp
-RUN git clone ${CLONE_REPOSITORY_URL}
+RUN git clone ${CLONE_REPOSITORY_URL} --recurse-submodules
 RUN cd janeway && git switch --detach ${CLONE_TAG_VERSION}
 
 # Install Python required packages
