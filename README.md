@@ -195,7 +195,7 @@ tag matching a specific regular expression pattern. It is VERY IMPORTANT
 that this is done correctly, as it impacts not only which version of Janeway
 is chosen to build but also impacts the application update process.
 
-The tag naming scheme uses this format: `<janeway.source.tag.(usmai|base).fork_variant-build_version>`. 
+The tag naming scheme uses this format: `<janeway_source_tag.(usmai|base).fork_variant-build_version>`. 
 
 For example: `v1.8.3.base.0-3`
 
@@ -203,10 +203,11 @@ For example: `v1.8.3.base.0-3`
 * `.base`: Use the base Janeway source code (official OLH repo).
 * `.0`: The variant of the code. This isn't relevant for the official
   repo because we aren't modifying their code, but it's there to make the
-  tags match in format.
+  tags match in format. For USMAI, this means the nth iteration of revison
+  for that version of Janeway.
 * `-3`: The build version. Used if we need to publish a new version of the
   image with the same code version as the previous version. Differentiates
   the image without causing Janeway to update.
 
 For the USMAI variant: `v1.8.3.usmai.3-3`. The `usmai.3` portion indicates that
-it's the 3rd revision of our fork based off Janeway `v1.8.3`. 
+it's the 3rd revision of our fork based off Janeway `v1.8.3`.

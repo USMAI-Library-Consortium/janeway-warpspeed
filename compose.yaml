@@ -37,7 +37,7 @@ services:
     # Use same python as janeway-web to reduce the number of images
     networks:
       - janeway-net
-    image: python:3.8
+    image: python:3.11
     entrypoint: python -u -m smtpd -c DebuggingServer -n 0.0.0.0:1025
 
   start_janeway_dependencies:

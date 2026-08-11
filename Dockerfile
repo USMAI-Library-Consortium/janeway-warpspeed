@@ -25,23 +25,36 @@ ENV JANEWAY_VERSION=$JANEWAY_VERSION
 
 # Create the virtual environment
 RUN python3 -m venv $VENV_PATH
+RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=26.0.0,<27.0.0'
 
 # ------------------------ JANEWAY MAIN PYTHON DEPENDENCIES ----------------------
 # Clone Janeway into tmp directory
 WORKDIR /tmp
-RUN git clone ${CLONE_REPOSITORY_URL} --recurse-submodules
-RUN cd janeway && git switch --detach ${CLONE_TAG_VERSION}
+RUN git clone --branch ${CLONE_TAG_VERSION} ${CLONE_REPOSITORY_URL}
 
 # Install Python required packages
 RUN mkdir -p /vol/janeway/
 RUN cp ./janeway/requirements.txt /vol/janeway
 WORKDIR /vol/janeway
 RUN source ${VENV_PATH}/bin/activate && pip3 install -r requirements.txt
-RUN source ${VENV_PATH}/bin/activate && pip3 install 'gunicorn>=26.0.0,<27.0.0'
 
-# Don't generate pycache files for Janeway during runtime -
-# That's why its not with the other ENV Variables - I'm allowing
-# it for the pip3 install but not Janeway
+# ------------------------ PLUGINS AND PLUGIN DEPENDENCIES ------------------------
+WORKDIR /tmp/janeway
+RUN mkdir -p /vol/janeway/src/available-plugins
+RUN if [ -f ./plugins.txt ]; then \
+      while read -r url ref; do \
+        [ -z "$url" ] && continue; \
+        case "$url" in "#"*) continue ;; esac; \
+        name=$(basename "$url" .git); \
+        echo "Cloning plugin: $url ($ref) -> $name"; \
+        git clone --branch "$ref" "$url" "/vol/janeway/src/available-plugins/$name" || exit 1; \
+      done < ./plugins.txt; \
+    else \
+      echo "No plugins.txt found - skipping plugin stage."; \
+    fi
+
+# Don't generate pycache files for Janeway during runtime.
+# I'm allowing it for the pip3 install but not Janeway
 ENV PYTHONDONTWRITEBYTECODE=1
 
 # ----------------------- JANEWAY SOURCE CODE --------------------------
@@ -63,15 +76,6 @@ COPY extract_default_journal_domain.py /usr/local/bin/
 # be corrected another way in the future.
 RUN mkdir -p /vol/janeway/logs
 RUN touch /vol/janeway/logs/janeway.logs
-
-# This is so our forked Janeway repo can also store our desired plugins. You will
-# likely want to extend our open-source Janeway image and clone the plugins in
-# that Dockerfile rather than re-build the base image with a custom fork.
-# Make available plugins directory if does not exist
-RUN mkdir -p /vol/janeway/src/available-plugins
-RUN mkdir -p available-plugins
-# Copy included plugins into available plugins directory
-RUN cp -r available-plugins/. /vol/janeway/src/available-plugins
 
 # Delete everything in the temp directory
 WORKDIR /vol/janeway
@@ -97,7 +101,7 @@ RUN mkdir -p ${STATIC_DIR} ${MEDIA_DIR}
 # app spec. To grant access to www-data for all mounted volumes, set securityContext.fsGroup
 # equal to 33 (which is the group ID for www-data).
 RUN mkdir -p /var/www/janeway/collected-static /var/www/janeway/media \
-    /var/www/janeway/additional-plugins /var/www/janeway/logs
+    /var/www/janeway/logs
 RUN chown --recursive janeway:janeway /vol/janeway /var/www/janeway /tmp
 # Allow www-data to use cron
 RUN usermod -aG crontab janeway
