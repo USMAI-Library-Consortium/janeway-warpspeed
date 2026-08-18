@@ -28,7 +28,7 @@ if journal_domains:
         ALLOWED_HOSTS.append(domain)
 
 CSRF_TRUSTED_ORIGINS=[
-    os.environ.get('JANEWAY_PRESS_DOMAIN_SCHEME') + os.environ.get('JANEWAY_PRESS_DOMAIN')
+    os.environ.get('JANEWAY_PRESS_DOMAIN_SCHEME', "") + os.environ.get('JANEWAY_PRESS_DOMAIN', "")
 ]
 
 if DEBUG:

@@ -1,7 +1,7 @@
 services:
 
   janeway-postgres:
-    image: postgres:12
+    image: postgres:15
     networks:
       - janeway-net
     volumes:

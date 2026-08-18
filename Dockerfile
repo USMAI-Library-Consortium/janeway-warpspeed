@@ -10,9 +10,8 @@ RUN apt-get install -y gettext pandoc cron postgresql-client \
 
 # --------------- ARGUMENTS FOR BUILDING THE IMAGE -------------------
 ARG CLONE_REPOSITORY_URL=https://github.com/openlibhums/janeway.git
-ARG CLONE_TAG_VERSION=v1.8.0
-ARG JANEWAY_VERSION=v1.8.0
-
+ARG CLONE_TAG_VERSION=v1.8.1
+ARG JANEWAY_VERSION=v1.8.1
 
 # ----------------------- ENVIRONMENT VARIABLES ---------------------
 ENV VENV_PATH=/opt/venv
@@ -20,7 +19,6 @@ ENV PATH="$VENV_PATH/bin:$PATH"
 ENV STATIC_DIR=/var/www/janeway/collected-static
 ENV MEDIA_DIR=/var/www/janeway/media
 ENV DB_VENDOR="postgres"
-ENV PYTHON_ENABLE_GUNICORN_MULTIWORKERS='true'
 ENV JANEWAY_VERSION=$JANEWAY_VERSION
 
 # Create the virtual environment
@@ -34,7 +32,7 @@ RUN git clone --branch ${CLONE_TAG_VERSION} ${CLONE_REPOSITORY_URL}
 
 # Install Python required packages
 RUN mkdir -p /vol/janeway/
-RUN cp ./janeway/requirements.txt /vol/janeway
+RUN cp -p ./janeway/requirements.txt /vol/janeway
 WORKDIR /vol/janeway
 RUN source ${VENV_PATH}/bin/activate && pip3 install -r requirements.txt
 
@@ -59,7 +57,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 # ----------------------- JANEWAY SOURCE CODE --------------------------
 WORKDIR /tmp/janeway
-RUN cp -r src /vol/janeway/
+RUN cp -rp src /vol/janeway/
 # Copy custom settings file into Janeway
 COPY prod_settings.py /vol/janeway/src/core/
 # Copy kubernetes install and setup script into Janeway
@@ -111,6 +109,8 @@ RUN chmod +x /vol/janeway/docker/autorun.sh /vol/janeway/docker/initialize-janew
 USER janeway
 
 ENV JANEWAY_SETTINGS_MODULE=core.prod_settings
+ENV XDG_RUNTIME_DIR="/tmp"
+ENV WEB_CONCURRENCY="3"
 
 WORKDIR /vol/janeway
 CMD ["/vol/janeway/docker/autorun.sh"]

@@ -1,4 +1,4 @@
-import os
+import subprocess
 
 from django.core.management.base import BaseCommand # type: ignore
 from django.core.management import call_command # type: ignore
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         call_command("migrate")
         call_command("build_assets")
         call_command("load_default_settings")
-        os.system("python3 src/manage.py update_repository_settings")
+        subprocess.run(["python3", "src/manage.py", "update_repository_settings"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         call_command("manage_plugins")
         call_command("update_translation_fields")
         call_command("clear_cache")
@@ -41,3 +41,5 @@ class Command(BaseCommand):
             print("Internal Cron installation disabled.")
             
         call_command("populate_history", "cms.Page", "comms.NewsItem", "repository.Repository")
+        call_command("import_ror_data")
+        call_command("match_ror_ids")

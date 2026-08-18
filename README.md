@@ -155,14 +155,8 @@ variables are divided into four categories:
    be fine in many cases)
 3. DJANGO_DEBUG: Whether to run Django in debug mode. Should always be 'off' in
    production.
-4. PYTHON_ENABLE_GUNICORN_MULTIWORKERS: Enable Gunicorn multi worker multi
-   thread config. 'true' or 'false', default true.
-5. PYTHON_GUNICORN_CUSTOM_WORKER_NUM: Set the number of Gunicorn workers. Only
-   works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'. Default
-   (2 * CPU Core number) + 1
-6. PYTHON_GUNICORN_CUSTOM_THREAD_NUM: Set the number of Gunicorn worker
-   threads. Only works when PYTHON_ENABLE_GUNICORN_MULTIWORKERS set to 'true'.
-   Default 1.
+4. WEB_CONCURRENCY: Set the number of Gunicorn workers to use. Best practice is
+   2 * num CPU cores + 1
 
 ### Conditionally required environment variables
 

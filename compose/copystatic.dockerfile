@@ -10,12 +10,11 @@ RUN mkdir -p /vol/janeway/src/transform/xsl \
 
 # Clone Janeway into tmp directory
 WORKDIR /tmp
-RUN git clone ${CLONE_REPOSITORY_URL}
-RUN cd janeway && git switch --detach ${CLONE_TAG_VERSION}
+RUN git clone --branch ${CLONE_TAG_VERSION} ${CLONE_REPOSITORY_URL}
 
-RUN cp -r ./janeway/src/transform/xsl/ /vol/janeway/src/transform/xsl
-RUN cp -r ./janeway/src/static/ /vol/janeway/src/static/
+RUN cp -rp ./janeway/src/transform/xsl/ /vol/janeway/src/transform/xsl
+RUN cp -rp ./janeway/src/static/ /vol/janeway/src/static/
 
 RUN rm -r janeway
 
-ENTRYPOINT [ "/bin/bash", "-c", "cp -rf /vol/janeway/src/transform/xsl/* /vol/janeway/src/transform/xslDynamic && cp -rf /vol/janeway/src/static/* /vol/janeway/src/staticDynamic" ]
+ENTRYPOINT [ "/bin/bash", "-c", "cp -rfp /vol/janeway/src/transform/xsl/* /vol/janeway/src/transform/xslDynamic && cp -rfp /vol/janeway/src/static/* /vol/janeway/src/staticDynamic" ]

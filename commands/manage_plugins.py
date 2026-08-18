@@ -97,7 +97,7 @@ class Command(BaseCommand):
                 if action_taken == "update":
                     updated_plugins.append(available_plugin_name)
         
-        os.system("python3 -m compileall -q /vol/janeway/src/plugins")
+        subprocess.run(["python3", "-m", "compileall", "-q", "/vol/janeway/src/plugins"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         call_command("install_plugins")
         if installed_plugins: print(f"Plugins Installed: {', '.join(installed_plugins)}")
