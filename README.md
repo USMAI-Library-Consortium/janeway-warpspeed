@@ -43,16 +43,16 @@ building your image with these 3 variables:
 `CLONE_TAG_VERSION`: The tag of Janeway that you wish to use. This can also
   be a specific commit.
 `JANEWAY_VERSION`: Ideally, a version representing an official Janeway release.
-If you have your own Janeway source code, you can still use the offical Janeway
+If you have your own Janeway source code, you can still use the official Janeway
 release but suffix it with an incrementing number (i.e. v1.8.0-2, v1.8.0-3).
 **used only to determine when to update Janeway, so it should represent when
 the source code is updated.**
 
 > [!WARNING]
 > The JANEWAY_VERSION must always be incrementing, even if you switch source
-> code repos. Say you're on Janeway 1.8.0 and decide you need to start maintaning
+> code repos. Say you're on Janeway 1.8.0 and decide you need to start maintaining
 > your own version. You can have your own version and still keep it incrementing
-> with 1.8.0-1, 1.8.0-2, etc. This is a good practice as well as it parallels
+> with 1.8.0-0, 1.8.0-1, etc. This is a good practice as well as it parallels
 > the Janeway versions. If you use a LOWER version the application will refuse to
 > launch.
 
@@ -204,4 +204,4 @@ For example: `v1.8.3.base.0-3`
   the image without causing Janeway to update.
 
 For the USMAI variant: `v1.8.3.usmai.3-3`. The `usmai.3` portion indicates that
-it's the 3rd revision of our fork based off Janeway `v1.8.3`.
+it's the 4th revision of our fork based off Janeway `v1.8.3`.
