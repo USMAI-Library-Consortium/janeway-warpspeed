@@ -42,4 +42,7 @@ class Command(BaseCommand):
             
         call_command("populate_history", "cms.Page", "comms.NewsItem", "repository.Repository")
         call_command("import_ror_data")
-        call_command("match_ror_ids")
+        try:
+            call_command("match_ror_ids")
+        except ZeroDivisionError:
+            print("Zero Division Error in ROR matching. This is a known bug in Janeway 1.8.1.")
